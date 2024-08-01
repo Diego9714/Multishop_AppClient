@@ -5,6 +5,7 @@ import React, { useState, useEffect, useCallback }      from 'react'
 import { AntDesign, MaterialIcons, FontAwesome }        from '@expo/vector-icons'
 import AsyncStorage                                     from '@react-native-async-storage/async-storage'
 import { LinearGradient }                               from 'expo-linear-gradient'
+import { useFocusEffect }                               from '@react-navigation/native';
 // Modals And Components
 import ModalProduct                                     from '../products/ModalProducts'
 import SaveOrder                                        from './SaveOrder'
@@ -32,6 +33,15 @@ const SelectProducts = ({ isVisible, onClose }) => {
   const [isFiltering, setIsFiltering] = useState(false)
   const [prodExistence, setProdExistence] = useState(null)
   
+  // Use useFocusEffect to reset state when the component is focused
+  useFocusEffect(
+    useCallback(() => {
+      // Reset the state when the component is focused
+      setIsSaveOrderModalVisible(false)
+      fetchProducts();
+    }, [])
+  );
+
   useEffect(() => {
     const getProducts = async () => {
       const productsInfo = await AsyncStorage.getItem('products')
@@ -335,6 +345,30 @@ const SelectProducts = ({ isVisible, onClose }) => {
     }
   }
 
+  const fetchProducts = async () => {
+    try {
+      const productsInfo = await AsyncStorage.getItem('products');
+      const productsJson = JSON.parse(productsInfo);
+      const filteredProducts = (productsJson || []).filter(product => product.existencia > 0);
+      setProducts(filteredProducts);
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+    }
+  };
+  
+
+  const handleOrderSaved = () => {
+    setIsSaveOrderModalVisible(false);
+    setSelectedProductsCount(0);
+    setSearchProduct('');
+    setDisplaySearchProduct('');
+    setPage(1);
+    setSelectedProduct(null);
+    setProductQuantities({});
+
+    fetchProducts();
+  };
+
   return (
     <Modal visible={isVisible} animationType="slide" transparent={true}>
       <LinearGradient
@@ -462,6 +496,7 @@ const SelectProducts = ({ isVisible, onClose }) => {
             order={generateSelectedProductJSON()}
             onQuantityChange={handleQuantityChange}
             onDeleteProduct={handleProductDelete}
+            onOrderSaved={handleOrderSaved}
           />
         </View>
       </LinearGradient>

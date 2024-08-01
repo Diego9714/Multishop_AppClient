@@ -18,7 +18,7 @@ import * as FileSystem                from 'expo-file-system';
 // JWT - Token
 import JWT from 'expo-jwt'
 
-const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduct }) => {
+const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduct, onOrderSaved  }) => {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [invoiceType, setInvoiceType] = useState(null);
@@ -33,7 +33,7 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
   const [cambioPesos, setCambioPesos] = useState(null);
   const [pdfUri, setPdfUri] = useState(null);
   const navigation = useNavigation();
-  
+  const [orderSaved, setOrderSaved] = useState(false)
 
   useEffect(() => {
     if (order && order.products) {
@@ -142,68 +142,68 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
     return `${timestamp}-${randomNumber}`;
   };
 
-  const handleSaveOrder = async () => {
-    if (!invoiceType) {
-      Alert.alert('Error', 'Debe seleccionar el tipo de factura');
-      return;
-    }
-  
-    if (products.length === 0) {
-      Alert.alert('Error', 'Debe seleccionar al menos un producto');
-      return;
-    }
-
-    let prodExistence = client.prodExistence
-  
-    const orderData = {
-      id_order: generateRandomProductId(),
-      id_scli: client.id_scli,
-      cod_cli: client.cod_cli,
-      nom_cli: client.nom_cli,
-      tlf_cli: client.tel_cli,
-      dir_cli: client.dir1_cli,
-      products: products.map(product => ({
-        codigo: product.codigo,
-        descrip: product.descrip,
-        exists: product.quantity, // Recalcular la existencia
-        quantity: product.quantity,
-        priceUsd: product.priceUsd,
-        priceBs: (product.priceUsd * cambioBolivares).toFixed(2),
-      })),
-      tipfac: invoiceType,
-      totalUsd: parseFloat(totalPriceUsd),
-      totalBs: parseFloat((totalPriceUsd * cambioBolivares).toFixed(2)),
-      fecha: new Date().toISOString(),
-      prodExistence : prodExistence
-    };
-
-    try {
-      const existingOrders = await AsyncStorage.getItem('OrdersClient');
-      const orders = existingOrders ? JSON.parse(existingOrders) : [];
-      orders.push(orderData);
-      await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
-  
-      // Actualizar existencias en la lista de productos solo si prodExistence != 0
-      if (prodExistence !== 0) {
-        const productsInfo = await AsyncStorage.getItem('products');
-        const productList = productsInfo ? JSON.parse(productsInfo) : [];
-  
-        const updatedProductList = productList.map(prod => {
-          const orderedProduct = products.find(p => p.codigo === prod.codigo);
-          if (orderedProduct) {
-            return { ...prod, existencia: prod.existencia - orderedProduct.quantity };
-          }
-          return prod;
-        });
-  
-        await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+    const handleSaveOrder = async () => {
+      if (!invoiceType) {
+        Alert.alert('Error', 'Debe seleccionar el tipo de factura');
+        return;
       }
-  
-      setIsOrderSavedModalVisible(true); // Mostrar el modal de confirmación
-    } catch (error) {
-      console.error('Error saving order:', error);
-    }
-  };
+    
+      if (products.length === 0) {
+        Alert.alert('Error', 'Debe seleccionar al menos un producto');
+        return;
+      }
+
+      let prodExistence = client.prodExistence
+    
+      const orderData = {
+        id_order: generateRandomProductId(),
+        id_scli: client.id_scli,
+        cod_cli: client.cod_cli,
+        nom_cli: client.nom_cli,
+        tlf_cli: client.tel_cli,
+        dir_cli: client.dir1_cli,
+        products: products.map(product => ({
+          codigo: product.codigo,
+          descrip: product.descrip,
+          exists: product.quantity, // Recalcular la existencia
+          quantity: product.quantity,
+          priceUsd: product.priceUsd,
+          priceBs: (product.priceUsd * cambioBolivares).toFixed(2),
+        })),
+        tipfac: invoiceType,
+        totalUsd: parseFloat(totalPriceUsd),
+        totalBs: parseFloat((totalPriceUsd * cambioBolivares).toFixed(2)),
+        fecha: new Date().toISOString(),
+        prodExistence : prodExistence
+      };
+
+      try {
+        const existingOrders = await AsyncStorage.getItem('OrdersClient');
+        const orders = existingOrders ? JSON.parse(existingOrders) : [];
+        orders.push(orderData);
+        await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
+    
+        // Actualizar existencias en la lista de productos solo si prodExistence != 0
+        if (prodExistence !== 0) {
+          const productsInfo = await AsyncStorage.getItem('products');
+          const productList = productsInfo ? JSON.parse(productsInfo) : [];
+    
+          const updatedProductList = productList.map(prod => {
+            const orderedProduct = products.find(p => p.codigo === prod.codigo);
+            if (orderedProduct) {
+              return { ...prod, existencia: prod.existencia - orderedProduct.quantity };
+            }
+            return prod;
+          });
+    
+          await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+        }
+        
+        setIsOrderSavedModalVisible(true); // Mostrar el modal de confirmación
+      } catch (error) {
+        console.error('Error saving order:', error);
+      }
+    };
   
   const generatePdfFileName = () => {
     return `Pedido_${generateRandomProductId()}.pdf`;
@@ -517,7 +517,8 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
           onClose={() => setIsOrderSavedModalVisible(false)}
           onOrderSaved={() => {
             setIsOrderSavedModalVisible(false);
-            handlePress('Home');
+            handlePress('Sincro');
+            onOrderSaved() 
           }}
         />
         </View>
