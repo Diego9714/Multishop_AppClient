@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 2,
     shadowRadius: 2,
     elevation: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
   },
   gradientBackground: {
     width: '100%',
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#fff',
     textAlign: 'center'
   },
   mainSubtitle: {
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   buttonsAction: {
-    marginTop: "2%",
+    marginTop: "5%",
     flexDirection: "row",
     gap: 30,
     marginBottom: '5%'
@@ -57,21 +58,53 @@ const styles = StyleSheet.create({
     gap: 30,
     marginBottom: '5%'
   },
+  dateSelectorsContainer:{
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 20,
+  },
   buttonDate: {
-    width: 150,
-    backgroundColor: '#38B0DB',
+    width: 120,
+    backgroundColor: '#fff',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 6,
     shadowColor: "#000",
     shadowOffset: {
-      width: 0,
-      height: 2,
+      width: 5,
+      height: 5,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  searchContainer:{
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 20,
+    paddingHorizontal: 20,
+  },
+  buttonSearch: {
+    width: 40,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 6,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 5,
+      height: 5,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginTop: 20,
+    marginBottom: 20,
   },
   buttonExit: {
     width: 120,
@@ -89,8 +122,19 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5
   },
+  buttonTextDate: {
+    color: "#6b6b6b",
+    textAlign: "center",
+    lineHeight: 25,
+  },
+  buttonTextSearch:{
+    color: "#6b6b6b",
+    textAlign: "center",
+    lineHeight: 25,
+    marginRight: 5,
+  },
   buttonText: {
-    color: "white",
+    color: "#FFF",
     textAlign: "center",
     lineHeight: 25
   },
@@ -99,7 +143,7 @@ const styles = StyleSheet.create({
     height: "56%",
     width: "90%",
     // margin: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.70)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderRadius: 20,
   },
   headerProductContainer:{
@@ -135,17 +179,28 @@ const styles = StyleSheet.create({
   },
   productItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 15,
+    paddingVertical: 10,
+    margin: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   nameProd: {
-    width: '45%'
+    width: '35%',
+    textAlign: 'center',
+    justifyContent: 'center',
+    // backgroundColor: 'gray',
   },
-  quantityContainer: {
-    width: '30%',
+  nameProducts: {
+    textAlign: 'center',
+    justifyContent: 'center',
+    // backgroundColor: 'gray',
+  },
+  priceContainer: {
+    width: '33.3%',
     alignItems: 'center',
+    // backgroundColor: 'gray',
   },
   quantityInput: {
     borderWidth: 1,
@@ -156,21 +211,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonAction: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    width: '25%',
     alignItems: 'center',
-  },
-  button: {
-    padding: 5,
+    // backgroundColor: 'gray'
   },
   buttonMore: {
-    padding: 5,
-    marginRight: 15,
+    // padding: 5,
+    // marginRight: 15,
   },
-  centerButtonPlaceholder: {
-    width: 30, // mismo ancho que el icono delete para mantener el espacio consistente
-    height: 30,
-  },
+  // centerButtonPlaceholder: {
+  //   width: 30, // mismo ancho que el icono delete para mantener el espacio consistente
+  //   height: 30,
+  // },
   pagination: {
     // height: '8%',
     width: '100%',

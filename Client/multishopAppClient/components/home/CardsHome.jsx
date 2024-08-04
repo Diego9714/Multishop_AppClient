@@ -1,21 +1,21 @@
 import React, { useState, useCallback } from 'react'
-import { Text, View, TouchableOpacity } from 'react-native'
+import { Text, View, TouchableOpacity, ImageBackground } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { LinearGradient } from 'expo-linear-gradient'
+// Styles
+import { images } from '../../constants'
 import styles from '../../styles/CardsHome.styles'
 // Screens
 import Sincro from '../../app/(tabs)/Sincro'
 import Products from '../../app/(tabs)/Products'
 // Components
 import SelectProducts from '../../components/orders/SelectProducts'
-import Report from '../../components/reports/Report'
-
+import ModalSelectReport from '../../components/reports/ModalSelectReport'
 
 const CardsHome = () => {
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false)
-  const [isReportesModalVisible, setIsReportesModalVisible] = useState(false)
+  const [isModalSelectReportVisible, setIsModalSelectReportVisible] = useState(false)
 
   // SelectProducts
   const openSelectProductsModal = () => {
@@ -27,12 +27,12 @@ const CardsHome = () => {
   }
 
   // Report
-  const openReportesModal = () => {
-    setIsReportesModalVisible(true)
+  const openModalSelectReport = () => {
+    setIsModalSelectReportVisible(true)
   }
 
-  const closeReportesModal = () => {
-    setIsReportesModalVisible(false)
+  const closeModalSelectReport = () => {
+    setIsModalSelectReportVisible(false)
   }
 
   const navigation = useNavigation()
@@ -50,8 +50,8 @@ const CardsHome = () => {
   )
 
   return (
-    <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+    <ImageBackground
+      source={images.fondo}
       style={styles.gradientBackground}
     >
       <View style={styles.mainContainer}>
@@ -65,11 +65,6 @@ const CardsHome = () => {
             <MaterialCommunityIcons name='truck' color="#38B0DB" size={80} />
             <Text style={styles.title}>Pedidos</Text>
           </TouchableOpacity>
-
-          <SelectProducts
-            isVisible={isSelectProductsModalVisible}
-            onClose={closeSelectProductsModal}
-          />
 
           <TouchableOpacity
             style={styles.cardContainer}
@@ -95,20 +90,26 @@ const CardsHome = () => {
             style={styles.cardContainer}
             activeOpacity={0.7}
             useNativeDriver={true}
-            onPress={openReportesModal}
+            onPress={openModalSelectReport}
           >
             <MaterialIcons name="query-stats" size={80} color="#38B0DB" />
             <Text style={styles.title}>Reportes</Text>
           </TouchableOpacity>
 
-          <Report
-            isVisible={isReportesModalVisible}
-            onClose={closeReportesModal}
-          />
-
         </View>
       </View>
-    </LinearGradient>
+
+      <SelectProducts
+        isVisible={isSelectProductsModalVisible}
+        onClose={closeSelectProductsModal}
+      />
+
+      <ModalSelectReport
+        isModalSelectReportVisible={isModalSelectReportVisible}
+        onClose={closeModalSelectReport}
+      />
+      
+    </ImageBackground>
   )
 }
 

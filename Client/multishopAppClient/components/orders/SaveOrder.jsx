@@ -1,7 +1,7 @@
 // Dependencies
 import React, { useState, useEffect } from 'react';
 import { Text, View, Modal, 
-Pressable, ScrollView, Alert }        from 'react-native';
+Pressable, ScrollView, Alert , ImageBackground } from 'react-native';
 import AsyncStorage                   from '@react-native-async-storage/async-storage';
 import { useNavigation }              from '@react-navigation/native';
 import { LinearGradient }             from 'expo-linear-gradient';
@@ -11,6 +11,7 @@ import ModalEditProd                  from './modalEditProd';
 import ModalOrderSaved                from './ModalOrderSaved';
 // Styles
 import styles                         from '../../styles/SaveOrder.styles';
+import { images }                     from '../../constants'
 // PDF
 import * as Print                     from 'expo-print';
 import * as Sharing                   from 'expo-sharing';
@@ -21,11 +22,12 @@ import JWT from 'expo-jwt'
 const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduct, onOrderSaved  }) => {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [invoiceType, setInvoiceType] = useState(null);
+  const [invoiceType, setInvoiceType] = useState("Orden");
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
   const [isOrderSavedModalVisible, setIsOrderSavedModalVisible] = useState(false);
   const [products, setProducts] = useState([]);
   const [client, setClient] = useState([]);
+  const [company, setCompany] = useState([])
   const [totalPriceUsd, setTotalPriceUsd] = useState(0);
   const [totalPriceBs, setTotalPriceBs] = useState(0);
   const [cambioBolivares, setCambioBolivares] = useState(null);
@@ -77,6 +79,15 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
     }
 
     getClient()
+  }, [])
+
+  useEffect(()=>{
+    const getCompany = async() =>{
+      let company = await AsyncStorage.getItem('company')
+      setCompany(company)
+    }
+
+    getCompany()
   }, [])
 
   const openProductModal = (product) => {
@@ -220,6 +231,8 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
       return;
     }
   
+    let dataCompany = JSON.parse(company)
+
     const htmlContent = `
     <html>
     <head>
@@ -240,9 +253,11 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
     }
     
     .date td{
-      text-align: right;
-    
       background-color: #f2f2f2;
+    }
+    
+    .datePdf{
+      text-align: right;
     }
     
     .clientData{
@@ -261,6 +276,10 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
     
     .orderNro , .tipfac{
       text-align: right;
+    }
+    
+    .itemProd{
+      text-align: left;
     }
     
     .item{
@@ -287,92 +306,87 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
       color: #666;
       text-align: center;
     }
+      
     </style>
     </head>
     <body>
-      <div class="receipt">
-        <table class="table">
-          <thead>
-            <tr class="date">
-              <td colspan="2">Fecha: ${new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-            </tr>
-            <td colspan="2"/>
-            <tr>
-              <td class="clientData"><strong>Datos del Cliente</strong></td>
-              <td class="orderNro"><strong>Pedido Nro: ${generateRandomProductId()}</strong></td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-                <td><strong>Nombre:</strong> ${client.nom_cli}</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td><strong>Rif:</strong> ${client.cod_cli}</td>
-                <td></td>
-            </tr>
-            <tr>
-              <td><strong>Teléfono:</strong> ${client.tel_cli}</td>
+    <div class="receipt">
+      <table class="table">
+        <thead>
+          <tr class="date">
+            <td><strong>${dataCompany[0].nom_emp}</strong></td>
+            <td class="datePdf">Fecha: ${new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+          </tr>
+  
+          <tr class="date">
+            <td colspan="2"><strong>${dataCompany[0].rif_emp}</strong></td>
+          </tr>
+          
+          <td colspan="2"/>
+          <tr>
+            <td class="clientData"><strong>Datos del Cliente</strong></td>
+            <td class="orderNro"><strong>Pedido Nro: ${generateRandomProductId()}</strong></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+              <td><strong>Nombre:</strong> ${client.nom_cli}</td>
               <td></td>
+          </tr>
+          <tr>
+              <td><strong>Rif:</strong> ${client.cod_cli}</td>
+              <td></td>
+          </tr>
+          <tr>
+            <td><strong>Teléfono:</strong> ${client.tel_cli}</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Dirección:</strong> ${client.dir1_cli}</td>
+            <td class="tipfac"><strong>Orden de Pedido</strong> 
+          </tr>
             </tr>
-            <tr>
-              <td><strong>Dirección:</strong> ${client.dir1_cli}</td>
-              <td class="tipfac"><strong>Tipo de Factura:</strong> ${invoiceType ? invoiceType : '--- Seleccionar ---'}</td>
-            </tr>
+        </tbody>
+      </table>
+      <table class="table">
+          <thead>
+              <tr>
+                  <td class="title"><strong>Producto</strong></td>
+                  <td class="title"><strong>Cantidad</strong></td>
+                  <td class="title"><strong>Precio</strong></td>
+                  <td class="title"><strong>Subtotal</strong></td>
+              </tr>
+          </thead>
+  
+          <tbody>
+            ${products.map(product => `
+              <tr>
+                  <td class="itemProd">${product.descrip}</td>
+                  <td class="item">${product.quantity}</td>
+                  <td class="item">${formatNumber(product.priceUsd)}</td>
+                  <td class="item">${formatNumber(product.quantity * product.priceUsd)}</td>
+              </tr>
+              `).join('')}
               </tr>
           </tbody>
-        </table>
-        <table class="table">
-            <thead>
-                <tr>
-                    <td class="title"><strong>Producto</strong></td>
-                    <td class="title"><strong>Cantidad</strong></td>
-                    <td class="title"><strong>Precio</strong></td>
-                    <td class="title"><strong>Subtotal</strong></td>
-                </tr>
-            </thead>
-  
-            <tbody>
-              ${products.map(product => `
-                <tr>
-                    <td class="item">${product.descrip}</td>
-                    <td class="item">${product.quantity}</td>
-                    <td class="item">${formatNumber(product.priceUsd)}</td>
-                    <td class="item">${formatNumber(product.quantity * product.priceUsd)}</td>
-                </tr>
-                `).join('')}
-                </tr>
-            </tbody>
-        </table>
-        <table class="table">
-            <thead>
-                <tr>
-                    <td class="tiposCambio"><strong>Tipos de Cambio</strong></td>
-                    <td class="totales" colspan="2"><strong>Totales</strong></td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Tasa COP:</strong> ${cambioDolares}</td>
-                    <td class="item">USD:</td>
-                    <td class="item">${formatNumber(totalPriceUsd)}</td>
-                </tr>
-                <tr>
-                    <td><strong>Tasa USD:</strong> ${cambioBolivares}</td>
-                    <td class="item">Bs.:</td>
-                    <td class="item">${formatNumber(totalPriceUsd * cambioBolivares)}</td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td class="item">Pesos:</td>
-                  <td class="item">${formatNumber(totalPriceUsd * cambioPesos)}</td>
-                </tr>
-            </tbody>
-        </table>
-        <p class="note">
-          Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.
-        </p>
-      </div>
+      </table>
+      <table class="table">
+          <thead>
+              <tr>
+                  <td class="totales" colspan="3"><strong>Totales</strong></td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td class="item" colspan = "2" >USD:</td>
+                  <td class="item">${formatNumber(totalPriceUsd)}</td>
+              </tr>
+          </tbody>
+      </table>
+      <p class="note">
+        Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.
+      </p>
+    </div>
     </body>
     </html>`;
   
@@ -396,9 +410,9 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -426,16 +440,17 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
             </View>
           </View>
 
-          <View style={styles.mainTitleContainer}>
+          {/* <View style={styles.mainTitleContainer}>
             <Text style={styles.mainTitle}>Tipo de Factura</Text>
-          </View>
+          </View> */}
 
           <View style={styles.detailedClientContainer}>
-            <Pressable style={styles.infoClientContainer} onPress={() => setIsInvoiceModalVisible(true)}>
-              <Text style={styles.textDetailedClient}>
-                {invoiceType ? invoiceType : '--- Seleccionar ---'}
+            <View style={styles.infoClientContainer} onPress={() => setIsInvoiceModalVisible(true)}>
+              <Text style={styles.factDetailedClient}>
+                {/* {invoiceType ? invoiceType : '--- Seleccionar ---'} */}
+                Orden
               </Text>
-            </Pressable>
+            </View>
           </View>
 
           <View style={styles.mainTitleContainer}>
@@ -462,18 +477,18 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
             </ScrollView>
           </View>
 
-          <View style={styles.exchangeRateContainer}>
+          {/* <View style={styles.exchangeRateContainer}>
             <Text style={styles.exchangeRateText}>Tasa COP: {cambioDolares}</Text>
             <Text style={styles.exchangeRateText}>Tasa USD: {cambioBolivares}</Text>
-          </View>
+          </View> */}
 
           <View style={styles.containerPrice}>
             <View style={styles.containerTitlePrice}>
-              <Text style={styles.titlePrice}>Totales</Text>
+              <Text style={styles.titlePrice}>Total:</Text>
             </View>
             <Text style={styles.textPrice}>USD : {formatNumber(totalPriceUsd)}</Text>
-            <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * cambioBolivares)}</Text>
-            <Text style={styles.textPrice}>Pesos : {formatNumber(totalPriceUsd * cambioPesos)}</Text>
+            {/* <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * cambioBolivares)}</Text>
+            <Text style={styles.textPrice}>Pesos : {formatNumber(totalPriceUsd * cambioPesos)}</Text> */}
           </View>
 
           <View style={styles.containerNote}>
@@ -522,7 +537,7 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
           }}
         />
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   );
 };

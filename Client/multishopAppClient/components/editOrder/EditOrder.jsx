@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
+import { Text, View, Modal, Pressable, ScrollView, Alert, ImageBackground } from 'react-native';
 import { LinearGradient }             from 'expo-linear-gradient';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem                from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/EditOrder.js';
+import { images }                     from '../../constants'
+
 import ModalEditProd from './modalEditProd';
 import EditSelectFact from './EditSelectFact';
 import SelectProducts from './SelectProducts';
@@ -15,14 +17,15 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   const [originalOrder, setOriginalOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
-  const [invoiceType, setInvoiceType] = useState(null);
+  const [invoiceType, setInvoiceType] = useState("Orden");
   const [totalUSD, setTotalUSD] = useState(0);
   const [totalBS, setTotalBS] = useState(0);
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false);
   const [cambioBolivares, setCambioBolivares] = useState(null);
   const [cambioDolares, setCambioDolares] = useState(null);
   const [cambioPesos, setCambioPesos] = useState(null);
-  const [pdfUri, setPdfUri] = useState(null);
+  const [pdfUri, setPdfUri] = useState(null)
+  const [company, setCompany] = useState([])
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -57,6 +60,15 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 
     fetchCurrency();
   }, []);
+
+  useEffect(()=>{
+    const getCompany = async() =>{
+      let company = await AsyncStorage.getItem('company')
+      setCompany(company)
+    }
+
+    getCompany()
+  }, [])
 
   const formatNumber = (number) => {
     return number.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -222,83 +234,97 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
       return;
     }
 
+    let dataCompany = JSON.parse(company)
+
     const htmlContent = `
     <html>
     <head>
     <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    
-    .receipt {
-      max-width: 800px;
-      margin: 20px auto;
-      background-color: #fff;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .date td{
-      text-align: right;
-    
-      background-color: #f2f2f2;
-    }
-    
-    
-    .clientData{
-      text-align: left;
-      background-color: #f2f2f2;
-    }
-    
-    .title{
-      text-align: center;
-      background-color: #f2f2f2;
-    }
-    
-    .title , .orderNro, .tiposCambio , .totales{
-      background-color: #f2f2f2;
-    }
-    
-    .orderNro , .tipfac{
-      text-align: right;
-    }
-    
-    .item{
-      text-align: center;
-    }
-    
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-    
-    .table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-    
-    .table th {
-      background-color: #f2f2f2;
-    }
-    
-    .note {
-      font-size: 12px;
-      color: #666;
-      text-align: center;
-    }
-    </style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      
+      .receipt {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      .date td{
+        background-color: #f2f2f2;
+      }
+      
+      .datePdf{
+        text-align: right;
+      }
+      
+      .clientData{
+        text-align: left;
+        background-color: #f2f2f2;
+      }
+      
+      .title{
+        text-align: center;
+        background-color: #f2f2f2;
+      }
+      
+      .title , .orderNro, .tiposCambio , .totales{
+        background-color: #f2f2f2;
+      }
+      
+      .orderNro , .tipfac{
+        text-align: right;
+      }
+      
+      .itemProd{
+        text-align: left;
+      }
+      
+      .item{
+        text-align: center;
+      }
+      
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      
+      .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      
+      .table th {
+        background-color: #f2f2f2;
+      }
+      
+      .note {
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+      }
+        
+      </style>
     </head>
     <body>
       <div class="receipt">
         <table class="table">
           <thead>
             <tr class="date">
-              <td colspan="2">Fecha: ${fechaFormateada}</td>
+              <td><strong>${dataCompany[0].nom_emp}</strong></td>
+              <td class="datePdf">Fecha: ${fechaFormateada}</td>
             </tr>
+
+            <tr class="date">
+              <td colspan="2"><strong>${dataCompany[0].rif_emp}</strong></td>
+            </tr>
+
             <td colspan="2"/>
             <tr>
               <td class="clientData"><strong>Datos del Cliente</strong></td>
@@ -320,7 +346,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
             </tr>
             <tr>
               <td><strong>Dirección:</strong> ${order.dir_cli}</td>
-              <td class="tipfac"><strong>Tipo de Factura:</strong> ${selectedOrder.tipfac}</td>
+              <td class="tipfac"><strong>Orden de Pedido</strong></td>
             </tr>
               </tr>
           </tbody>
@@ -338,7 +364,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
             <tbody>
               ${order.products.map(product => `
                 <tr>
-                    <td class="item">${product.descrip}</td>
+                    <td class="itemProd">${product.descrip}</td>
                     <td class="item">${product.quantity}</td>
                     <td class="item">${formatNumber(product.priceUsd)}</td>
                     <td class="item">${formatNumber(product.quantity * product.priceUsd)}</td>
@@ -350,25 +376,13 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         <table class="table">
             <thead>
                 <tr>
-                    <td class="tiposCambio"><strong>Tipos de Cambio</strong></td>
                     <td class="totales" colspan="2"><strong>Totales</strong></td>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>Tasa COP:</strong> ${cambioDolares}</td>
-                    <td class="item">USD:</td>
+                    <td class="item" colspan="2">USD:</td>
                     <td class="item">${formatNumber(totalUSD)}</td>
-                </tr>
-                <tr>
-                    <td><strong>Tasa USD:</strong> ${cambioBolivares}</td>
-                    <td class="item">Bs.:</td>
-                    <td class="item">${formatNumber(totalUSD * cambioBolivares)}</td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td class="item">Pesos:</td>
-                  <td class="item">${formatNumber(totalUSD * cambioPesos)}</td>
                 </tr>
             </tbody>
         </table>
@@ -401,9 +415,9 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -435,20 +449,21 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                     <Text style={styles.textDetailedClient}>{fechaFormateada}</Text>
                   </View>
                 </View>
-
+{/* 
                 <View style={styles.mainTitleContainer}>
                   <Text style={styles.mainTitle}>Tipo de Factura</Text>
-                </View>
+                </View> */}
 
                 <View style={styles.detailedClientContainerFac}>
-                  <Pressable
+                  <View
                     style={styles.infoClientContainer}
                     onPress={() => setIsInvoiceModalVisible(true)}
                   >
                     <Text style={styles.textDetailedClient}>
-                      {invoiceType ? invoiceType : selectedOrder.tipfac}
+                      {/* {invoiceType ? invoiceType : selectedOrder.tipfac} */}
+                      Orden
                     </Text>
-                  </Pressable>
+                  </View>
                 </View>
 
                 <View style={styles.mainTitleContainer}>
@@ -475,18 +490,18 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                   </View>
                 </View>
 
-                <View style={styles.exchangeRateContainer}>
+                {/* <View style={styles.exchangeRateContainer}>
               <Text style={styles.exchangeRateText}>Tasa COP: {cambioDolares}</Text>
               <Text style={styles.exchangeRateText}>Tasa USD: {cambioBolivares}</Text>
-            </View>
+            </View> */}
 
                 <View style={styles.containerPrice}>
                   <View style={styles.containerTitlePrice}>
                     <Text style={styles.titlePrice}>Total: </Text>
                   </View>
                   <Text style={styles.textPrice}>USD : {formatNumber(totalUSD)}</Text>
-                  <Text style={styles.textPrice}>Bs. : {formatNumber(totalUSD * 36.372)}</Text>
-                  <Text style={styles.textPrice}>Pesos : {formatNumber(totalUSD * 3700)}</Text>
+                  {/* <Text style={styles.textPrice}>Bs. : {formatNumber(totalUSD * 36.372)}</Text>
+                  <Text style={styles.textPrice}>Pesos : {formatNumber(totalUSD * 3700)}</Text> */}
                 </View>
 
                 <View style={styles.containerNote}>
@@ -543,7 +558,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           />
 
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   );
 };

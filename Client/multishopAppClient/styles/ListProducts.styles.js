@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
   gradientBackground: {
     width: '100%',
     height: '100%',
-    justifyContent: 'space-evenly', // Añadir esto si necesitas que los hijos se centren verticalmente
   },
   titlePage:{
     height: '6%',
@@ -19,7 +18,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 20,
     fontWeight: "400",
-    color: '#4D4D4D'
+    color: '#FFF'
   },
   finderContainer: {
     flexDirection: 'row',
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
     opacity: 0.7
   },
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.70)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     marginHorizontal: 10,
     height: "55%",
     borderRadius: 20,

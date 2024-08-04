@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 2,
     shadowRadius: 2,
     elevation: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
   },
   gradientBackground: {
     width: '100%',
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#fff',
     textAlign: 'center'
   },
   mainSubtitle: {
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     height: "56%",
     width: "90%",
     // margin: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.70)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderRadius: 20,
   },
   headerProductContainer:{

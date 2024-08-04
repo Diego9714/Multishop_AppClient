@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 20,
     width: '80%',
   },
   subtitleModal:{
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    marginTop: 10,
+    marginTop: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

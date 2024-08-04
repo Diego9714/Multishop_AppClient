@@ -1,14 +1,16 @@
 // Dependencies
 import React , {useState}                                                from 'react'
-import { Modal, View, Text, TouchableOpacity, ScrollView , Pressable }  from 'react-native'
+import { Modal, View, Text, TouchableOpacity, ScrollView , Pressable, ImageBackground }  from 'react-native'
 import { AntDesign, MaterialIcons, FontAwesome }        from '@expo/vector-icons'
 
 import { LinearGradient }                                   from 'expo-linear-gradient'
 import DateTimePicker from '@react-native-community/datetimepicker';
 // Styles
 import styles                                               from '../../styles/ReportModal.styles'
+import { images } from '../../constants'
 
-const Report = ({ isVisible, onClose }) => {
+
+const ReportProducts = ({ isVisible, onClose }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [isStartDatePickerVisible, setIsStartDatePickerVisible] = useState(false);
@@ -45,9 +47,9 @@ const Report = ({ isVisible, onClose }) => {
 
   return (
     <Modal transparent={true} visible={isVisible} onRequestClose={onClose} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
           <View style={styles.mainTitleContainer}>
@@ -58,7 +60,7 @@ const Report = ({ isVisible, onClose }) => {
 
           <View style={styles.buttonsDateAction}>
             <TouchableOpacity style={styles.buttonDate} onPress={showStartDatePicker}>
-              <Text style={styles.buttonText}>
+              <Text style={styles.buttonTextDate}>
                 Desde: {startDate.toISOString().split('T')[0]}
               </Text>
             </TouchableOpacity>
@@ -73,7 +75,7 @@ const Report = ({ isVisible, onClose }) => {
             )}
 
             <TouchableOpacity style={styles.buttonDate} onPress={showEndDatePicker}>
-              <Text style={styles.buttonText}>
+              <Text style={styles.buttonTextDate}>
                 Hasta:  {endDate.toISOString().split('T')[0]}
               </Text>
             </TouchableOpacity>
@@ -125,9 +127,9 @@ const Report = ({ isVisible, onClose }) => {
           </View>
 
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   )
 }
 
-export default Report
+export default ReportProducts

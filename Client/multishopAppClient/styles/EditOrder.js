@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 2,
     shadowRadius: 2,
     elevation: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
   },
   gradientBackground: {
     width: '100%',
@@ -42,13 +43,13 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#373A40',
+    color: '#000',
     textAlign: 'center',
   },
   detailedClientContainer: {
     margin: 25,
     padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
   detailedClientContainerFac:{
     margin: 25,
     padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
   infoClientContainer:{
     margin: '4%',
     padding: '4%',
-    backgroundColor: '#FFF',
+    backgroundColor: '#ebe8e8',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     color: '#4D4D4D',
   },
   ProductContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -192,9 +193,10 @@ const styles = StyleSheet.create({
   containerButton:{
     display: 'flex',
     flexDirection: 'row',
-    justifyContent:'space-evenly',
+    justifyContent:'center',
     alignItems: 'center',
     width: '100%',
+    gap: 20,
     marginTop: 20
   },
   selectProdContainer:{
@@ -211,6 +213,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#FF0000',
     borderRadius: 5,
+  },
+  otherButtonReport: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#38B0DB",
+    borderRadius: 5,
+    width: 100,
+  },
+  closeButtonReport: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#FF0000',
+    borderRadius: 5,
+    width: 100,
   },
   buttonText: {
     color: '#FFF',

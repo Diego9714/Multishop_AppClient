@@ -1,10 +1,11 @@
 // SelectProducts.js
 import React, { useState, useEffect, useCallback } from 'react'
-import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert, TouchableOpacity } from 'react-native'
+import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert, TouchableOpacity, ImageBackground } from 'react-native'
 import { AntDesign, FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { LinearGradient }                               from 'expo-linear-gradient'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import styles from '../../styles/SelectProducts.styles'
+import { images } from '../../constants'
 import ModalProduct from '../products/ModalProducts' // Adjust path as necessary
 import FilterCategories from '../filter/FilterCategories'
 // JWT - Token
@@ -317,9 +318,9 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
           <View style={styles.mainTitleContainer}>
@@ -440,7 +441,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
             />
           )}
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   )
 }

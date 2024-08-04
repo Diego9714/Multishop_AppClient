@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import ModalProducts from './ModalProducts';
 import FilterCategories from '../filter/FilterCategories';
 import styles from '../../styles/ListProducts.styles';
+import { images } from '../../constants'
+
 
 const ListProducts = () => {
   const [products, setProducts] = useState([]);
@@ -198,8 +200,8 @@ const ListProducts = () => {
   };
 
   return (
-    <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+    <ImageBackground
+      source={images.fondo}
       style={styles.gradientBackground}
     >
       <View style={styles.list}>
@@ -262,7 +264,7 @@ const ListProducts = () => {
           />
         )}
       </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 };
 

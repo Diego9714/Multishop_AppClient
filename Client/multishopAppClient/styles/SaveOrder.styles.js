@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 2,
     shadowRadius: 2,
     elevation: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
   },
   gradientBackground: {
     width: '100%',
@@ -39,14 +40,14 @@ const styles = StyleSheet.create({
   mainTitleOne: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#373A40',
+    color: '#000',
     textAlign: 'center',
     marginBottom: "10%"
   },
   mainTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#373A40',
+    color: '#000',
     textAlign: 'center',
   },
   detailedClientContainer: {
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '90%',
     padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     alignItems: 'center',
     borderRadius: 20,
     shadowColor: 'black',
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     width: '100%',
     margin: '4%',
     padding: '4%',
-    backgroundColor: '#fff',
+    backgroundColor: '#ebe8e8',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -81,9 +82,13 @@ const styles = StyleSheet.create({
   textDetailedClient:{
     color: '#4D4D4D',
   },
+  factDetailedClient:{
+    color: '#4D4D4D',
+    // textAlign: 'center'
+  },
   ProductContainer: {
     width: "100%",
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     borderBottomRightRadius: 20,

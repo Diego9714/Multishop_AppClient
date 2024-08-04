@@ -1,12 +1,13 @@
 // Dependencies
 import React, { useState, useEffect, useCallback }          from 'react'
 import { Text, View, Pressable, ScrollView, 
-Modal, Alert, ActivityIndicator }                           from 'react-native'
+Modal, Alert, ActivityIndicator , ImageBackground }         from 'react-native'
 import AsyncStorage                                         from '@react-native-async-storage/async-storage'
 import { Ionicons, MaterialIcons, MaterialCommunityIcons }  from '@expo/vector-icons'
 import { LinearGradient }                                   from 'expo-linear-gradient'
 // Styles
 import styles                                               from '../../styles/SelectOrders.styles'
+import { images }                                           from '../../constants'
 // Modals And Components
 import ModalSelectOrder                                     from './ModalSelectOrder'
 import ModalSincroOrder                                     from './ModalSincroOrder'
@@ -127,7 +128,6 @@ const SelectOrders = () => {
     }, 10000)
   
     const ordersToSync = orders.filter(order => selectedOrders[order.id_order])
-    // console.log('Orders to sync:', ordersToSync[0]?.products)
   
     try {
       const token = await AsyncStorage.getItem('tokenUser')
@@ -174,11 +174,28 @@ const SelectOrders = () => {
   
           setSelectedOrders({})
   
+          // Obtener la lista existente de pedidos sincronizados
+          const synchronizedOrdersString = await AsyncStorage.getItem('SynchronizedOrders')
+          // console.log("synchronizedOrdersString")
+          // console.log(synchronizedOrdersString)
+          const existingSynchronizedOrders = synchronizedOrdersString ? JSON.parse(synchronizedOrdersString) : []
+  
+          // Agregar los nuevos pedidos sincronizados a la lista existente
+          const updatedSynchronizedOrders = [
+            ...existingSynchronizedOrders,
+            ...completed
+          ]
+  
+          // Guardar la lista actualizada de pedidos sincronizados en AsyncStorage
+          await AsyncStorage.setItem('SynchronizedOrders', JSON.stringify(updatedSynchronizedOrders))
+  
+          // Actualizar la lista de pedidos almacenados
           const storedOrders = await AsyncStorage.getItem('OrdersClient')
           const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : []
   
           const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order))
           await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders))
+  
         } else {
           console.log('Unexpected response status:', response.status)
           setUnsynchronizedOrders(ordersToSync.map(order => ({
@@ -281,12 +298,11 @@ const SelectOrders = () => {
       setEditModalVisible(true)
     }
   }
-  
 
   return (
-    <LinearGradient
-    colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-    style={styles.gradientBackground}
+    <ImageBackground
+      source={images.fondo}
+      style={styles.gradientBackground}
     >
       <View style={styles.mainContainer}>
         <View style={styles.titlePage}>
@@ -389,7 +405,7 @@ const SelectOrders = () => {
           />
         )}
       </View>
-    </LinearGradient>
+    </ImageBackground>
   )
 }
 

@@ -1,6 +1,6 @@
 // Dependencies
 import { Text, View, Pressable, Modal, 
-  TextInput, ScrollView, Alert , TouchableOpacity }     from 'react-native'
+  TextInput, ScrollView, Alert , TouchableOpacity , ImageBackground }     from 'react-native'
 import React, { useState, useEffect, useCallback }      from 'react'
 import { AntDesign, MaterialIcons, FontAwesome }        from '@expo/vector-icons'
 import AsyncStorage                                     from '@react-native-async-storage/async-storage'
@@ -12,6 +12,7 @@ import SaveOrder                                        from './SaveOrder'
 import FilterCategories                                 from '../filter/FilterCategories'
 // Styles
 import styles                                           from '../../styles/SelectProducts.styles'
+import { images } from '../../constants'
 // JWT - Token
 import JWT from 'expo-jwt'
 
@@ -33,15 +34,6 @@ const SelectProducts = ({ isVisible, onClose }) => {
   const [isFiltering, setIsFiltering] = useState(false)
   const [prodExistence, setProdExistence] = useState(null)
   
-  // Use useFocusEffect to reset state when the component is focused
-  useFocusEffect(
-    useCallback(() => {
-      // Reset the state when the component is focused
-      setIsSaveOrderModalVisible(false)
-      fetchProducts();
-    }, [])
-  );
-
   useEffect(() => {
     const getProducts = async () => {
       const productsInfo = await AsyncStorage.getItem('products')
@@ -50,7 +42,20 @@ const SelectProducts = ({ isVisible, onClose }) => {
       setProducts(filteredProducts)
     }
     getProducts()
+
+    // const intervalId = setInterval(() => {
+    //   getProducts();
+    // }, 1000)
+  
+    // return () => clearInterval(intervalId);
   }, [])  
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsSaveOrderModalVisible(false)
+      fetchProducts();
+    }, [])
+  );
 
   useEffect(() => {
     let filteredProducts = products.filter(product => product.existencia > 0)
@@ -371,9 +376,9 @@ const SelectProducts = ({ isVisible, onClose }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide" transparent={true}>
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
           <View style={styles.mainTitleContainer}>
@@ -499,7 +504,7 @@ const SelectProducts = ({ isVisible, onClose }) => {
             onOrderSaved={handleOrderSaved}
           />
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   )
 }

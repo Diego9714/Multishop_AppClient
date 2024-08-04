@@ -20,18 +20,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 20,
     fontWeight: "400",
-    color: '#4D4D4D'
+    color: '#FFF',
   },
   listOrderContainer: {
     height: "55%",
     width: "90%",
-    backgroundColor: 'rgba(255, 255, 255, 0.70)',
-    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    borderRadius: 20,
     shadowColor: "#000",
   },
   headerProductContainer: {
     width: "100%",
-    backgroundColor: '#38B0DB',
+    backgroundColor: "#38B0DB",
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     color: '#fff',
@@ -46,18 +46,18 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   titleListClient: {
-    color: 'white',
+    color: '#fff',
     width: '30%',
     textAlign: 'center',
   },
   titleListPrice: {
-    color: 'white',
+    color: '#fff',
     width: '30%',
     textAlign: 'center',
 
   },
   titleListActions: {
-    color: 'white',
+    color: '#fff',
     width: '20%',
     textAlign: 'center',
   },

@@ -77,10 +77,10 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
               </View>
             </>
           )}
-          <Text style={styles.subtitleModal}>Precio(Bs)</Text>
+          {/* <Text style={styles.subtitleModal}>Precio(Bs)</Text>
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{formatNumber(product.precioUsd * cambioBolivares)}</Text>
-          </View>
+          </View> */}
           <Text style={styles.subtitleModal}>Precio(Usd)</Text>
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{formatNumber(product.precioUsd)}</Text>
