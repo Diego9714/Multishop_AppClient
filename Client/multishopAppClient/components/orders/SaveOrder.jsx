@@ -165,6 +165,17 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
       }
 
       let prodExistence = client.prodExistence
+
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+    
+      const fecha = new Date().toISOString();
+      const formattedDate = formatDate(fecha);
     
       const orderData = {
         id_order: generateRandomProductId(),
@@ -184,7 +195,7 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
         tipfac: invoiceType,
         totalUsd: parseFloat(totalPriceUsd),
         totalBs: parseFloat((totalPriceUsd * cambioBolivares).toFixed(2)),
-        fecha: new Date().toISOString(),
+        fecha: formattedDate,
         prodExistence : prodExistence
       };
 
@@ -440,14 +451,10 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
             </View>
           </View>
 
-          {/* <View style={styles.mainTitleContainer}>
-            <Text style={styles.mainTitle}>Tipo de Factura</Text>
-          </View> */}
-
           <View style={styles.detailedClientContainer}>
             <View style={styles.infoClientContainer} onPress={() => setIsInvoiceModalVisible(true)}>
               <Text style={styles.factDetailedClient}>
-                {/* {invoiceType ? invoiceType : '--- Seleccionar ---'} */}
+
                 Orden
               </Text>
             </View>
@@ -477,18 +484,11 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
             </ScrollView>
           </View>
 
-          {/* <View style={styles.exchangeRateContainer}>
-            <Text style={styles.exchangeRateText}>Tasa COP: {cambioDolares}</Text>
-            <Text style={styles.exchangeRateText}>Tasa USD: {cambioBolivares}</Text>
-          </View> */}
-
           <View style={styles.containerPrice}>
             <View style={styles.containerTitlePrice}>
               <Text style={styles.titlePrice}>Total:</Text>
             </View>
             <Text style={styles.textPrice}>USD : {formatNumber(totalPriceUsd)}</Text>
-            {/* <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * cambioBolivares)}</Text>
-            <Text style={styles.textPrice}>Pesos : {formatNumber(totalPriceUsd * cambioPesos)}</Text> */}
           </View>
 
           <View style={styles.containerNote}>

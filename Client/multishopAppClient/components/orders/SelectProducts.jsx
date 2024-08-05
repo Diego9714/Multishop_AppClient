@@ -199,7 +199,6 @@ const SelectProducts = ({ isVisible, onClose }) => {
     ))
   }, [productQuantities, products, prodExistence])
   
-
   const handleProductDelete = useCallback((productId) => {
     const updatedProductQuantities = { ...productQuantities }
     const wasSelected = productQuantities[productId] > 0
@@ -360,7 +359,6 @@ const SelectProducts = ({ isVisible, onClose }) => {
       console.error('Error al obtener productos:', error);
     }
   };
-  
 
   const handleOrderSaved = () => {
     setIsSaveOrderModalVisible(false);
@@ -416,12 +414,13 @@ const SelectProducts = ({ isVisible, onClose }) => {
             <View style={styles.headerProductContainer}>
               <View style={styles.titleListContainer}>
                 <Text style={styles.titleListProduct}>Producto</Text>
-                <Text style={styles.titleListCant}>Cantidad</Text>
+                {/* <Text style={styles.titleListCant}>Cantidad</Text> */}
                 <Text style={styles.titleListActions}>Acciones</Text>
               </View>
             </View>
 
-            <ScrollView>
+            <View style={styles.listContainer}>
+              <ScrollView>
               {visibleProducts.map((product, index) => (
                 <View key={index} style={styles.productItem}>
                   <View style={styles.nameProd}>
@@ -435,8 +434,7 @@ const SelectProducts = ({ isVisible, onClose }) => {
                       value={String(productQuantities[product.codigo] || '')}
                       onChangeText={text => handleQuantityChange(product.codigo, text)}
                     />
-                  </View>
-                  <View style={styles.buttonAction}>
+
                     {productQuantities[product.codigo] > 0 && (
                       <Pressable
                         style={styles.button}
@@ -445,6 +443,7 @@ const SelectProducts = ({ isVisible, onClose }) => {
                         <MaterialIcons name="delete" size={30} color="#7A7A7B" />
                       </Pressable>
                     )}
+                    
                     <Pressable
                       style={styles.buttonMore}
                       onPress={() => {
@@ -454,10 +453,15 @@ const SelectProducts = ({ isVisible, onClose }) => {
                     >
                       <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
                     </Pressable>
+
                   </View>
+                  {/* <View style={styles.buttonAction}>
+
+                  </View> */}
                 </View>
               ))}
-            </ScrollView>
+              </ScrollView>
+            </View>
           </View>
 
           <View style={styles.pagination}>

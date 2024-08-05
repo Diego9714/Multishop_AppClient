@@ -1,68 +1,54 @@
-import React, { useState } from 'react';
-import { Text, View, Modal, Pressable } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import styles from '../../styles/FilterProducts.styles';
-// import BrandFilteredModal from './BrandFilteredModal';
-import CategoriesFilteredModal from './CategoriesFilteredModal';
+import React, { useState } from 'react'
+import { Text, View, Modal, Pressable } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
+import styles from '../../styles/FilterProducts.styles'
+// import BrandFilteredModal from './BrandFilteredModal'
+import CategoriesFilteredModal from './CategoriesFilteredModal'
 
 const FilterCategories = ({ visible, onClose, onSave }) => {
-  const [selectedCategory, setSelectedCategory] = useState([]);
-  // const [selectedBrand, setSelectedBrand] = useState([]);
-  const [selectedPriceOrder, setSelectedPriceOrder] = useState(null);
-
-  const [selectedCategoryTemp, setSelectedCategoryTemp] = useState([]);
-  // const [selectedBrandTemp, setSelectedBrandTemp] = useState([]);
-  const [selectedPriceOrderTemp, setSelectedPriceOrderTemp] = useState(null);
-
-  // const [brandFilteredModalVisible, setBrandFilteredModalVisible] = useState(false);
-  const [categoriesFilteredModalVisible, setCategoriesFilteredModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState([])
+  const [selectedPriceOrder, setSelectedPriceOrder] = useState(null)
+  const [selectedCategoryTemp, setSelectedCategoryTemp] = useState([])
+  const [selectedPriceOrderTemp, setSelectedPriceOrderTemp] = useState(null)
+  const [categoriesFilteredModalVisible, setCategoriesFilteredModalVisible] = useState(false)
 
   const handleCategorySelect = () => {
-    setSelectedCategoryTemp(selectedCategory);
-    setCategoriesFilteredModalVisible(true);
-  };
-
-  // const handleBrandSelect = () => {
-  //   setSelectedBrandTemp(selectedBrand);
-  //   setBrandFilteredModalVisible(true);
-  // };
+    setSelectedCategoryTemp(selectedCategory)
+    setCategoriesFilteredModalVisible(true)
+  }
 
   const handlePriceOrderSelect = (order) => {
     if (selectedPriceOrderTemp === order) {
       // Deshabilitar la selección si ya está seleccionada
-      setSelectedPriceOrderTemp(null);
+      setSelectedPriceOrderTemp(null)
     } else {
       // Seleccionar la nueva opción
-      setSelectedPriceOrderTemp(order);
+      setSelectedPriceOrderTemp(order)
     }
-  };
+  }
 
   const handleSave = () => {
-    setSelectedCategory(selectedCategoryTemp);
-    // setSelectedBrand(selectedBrandTemp);
-    setSelectedPriceOrder(selectedPriceOrderTemp);
+    setSelectedCategory(selectedCategoryTemp)
+    setSelectedPriceOrder(selectedPriceOrderTemp)
 
     onSave({
       selectedCategory: selectedCategoryTemp,
-      // selectedBrand: selectedBrandTemp,
       selectedPriceOrder: selectedPriceOrderTemp,
-    });
+    })
 
-    onClose();
-  };
+    onClose()
+  }
 
   const handleClose = () => {
-    setSelectedCategoryTemp(selectedCategory);
-    // setSelectedBrandTemp(selectedBrand);
-    setSelectedPriceOrderTemp(selectedPriceOrder);
-    onClose();
-  };
+    setSelectedCategoryTemp(selectedCategory)
+    setSelectedPriceOrderTemp(selectedPriceOrder)
+    onClose()
+  }
 
   const handleClearFilters = () => {
-    setSelectedCategoryTemp([]);
-    // setSelectedBrandTemp([]);
-    setSelectedPriceOrderTemp(null);
-  };
+    setSelectedCategoryTemp([])
+    setSelectedPriceOrderTemp(null)
+  }
 
   return (
     <Modal transparent={true} animationType="fade" visible={visible} onRequestClose={handleClose}>
@@ -102,40 +88,6 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             </View>
           )}
 
-          {/* 
-          <Pressable
-            style={[
-              styles.filterContainer,
-              selectedBrandTemp.length > 0 && styles.selectedFilter,
-            ]}
-            onPress={handleBrandSelect}
-          >
-            <MaterialIcons
-              name="filter-2"
-              size={24}
-              color={selectedBrandTemp.length > 0 ? '#38B0DB' : 'black'}
-            />
-            <Text
-              style={[
-                styles.filterText,
-                selectedBrandTemp.length > 0 && { color: '#38B0DB' },
-              ]}
-            >
-              Marca
-            </Text>
-          </Pressable>
-
-          {selectedBrandTemp.length > 0 && (
-            <View style={styles.selectedItemsContainer}>
-              {selectedBrandTemp.map((brand) => (
-                <Text key={brand} style={styles.selectedItem}>
-                  {brand}
-                </Text>
-              ))}
-            </View>
-          )}
-          */}
-
           <Pressable
             style={[
               styles.filterContainer,
@@ -144,7 +96,7 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             onPress={() => handlePriceOrderSelect('menor-mayor')}
           >
             <MaterialIcons
-              name="filter-3"
+              name="filter-2"
               size={24}
               color={selectedPriceOrderTemp === 'menor-mayor' ? '#38B0DB' : 'black'}
             />
@@ -166,7 +118,7 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             onPress={() => handlePriceOrderSelect('mayor-menor')}
           >
             <MaterialIcons
-              name="filter-4"
+              name="filter-3"
               size={24}
               color={selectedPriceOrderTemp === 'mayor-menor' ? '#38B0DB' : 'black'}
             />
@@ -199,8 +151,8 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
         visible={brandFilteredModalVisible}
         onClose={() => setBrandFilteredModalVisible(false)}
         onSave={(selectedBrands) => {
-          setSelectedBrandTemp(selectedBrands);
-          setSelectedBrand(selectedBrands);
+          setSelectedBrandTemp(selectedBrands)
+          setSelectedBrand(selectedBrands)
         }}
         selectedBrands={selectedBrandTemp}
       />
@@ -210,13 +162,13 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
         visible={categoriesFilteredModalVisible}
         onClose={() => setCategoriesFilteredModalVisible(false)}
         onSave={(selectedCategories) => {
-          setSelectedCategoryTemp(selectedCategories);
-          setSelectedCategory(selectedCategories);
+          setSelectedCategoryTemp(selectedCategories)
+          setSelectedCategory(selectedCategories)
         }}
         selectedCategories={selectedCategoryTemp}
       />
     </Modal>
-  );
-};
+  )
+}
 
-export default FilterCategories;
+export default FilterCategories

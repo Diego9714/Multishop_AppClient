@@ -23,11 +23,10 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   listOrderContainer: {
-    height: "55%",
-    width: "90%",
+    height: "56%",
+    width: "95%",
     backgroundColor: 'rgba(255, 255, 255, 1)',
     borderRadius: 20,
-    shadowColor: "#000",
   },
   headerProductContainer: {
     width: "100%",
@@ -35,63 +34,68 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     color: '#fff',
-    marginBottom: 20
   },
   titleListContainer: {
     display: "flex",
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
+    // justifyContent: "space-evenly",
+    justifyContent: "center",
+    // gap: 20,
     paddingVertical: 15,
   },
   titleListClient: {
-    color: '#fff',
-    width: '30%',
-    textAlign: 'center',
+    color: 'white',
+    width: '50%',
+    // backgroundColor: 'gray',
+    textAlign: 'center'
   },
   titleListPrice: {
     color: '#fff',
-    width: '30%',
+    width: '25%',
     textAlign: 'center',
-
+    // backgroundColor: 'black',
   },
   titleListActions: {
     color: '#fff',
-    width: '20%',
+    width: '25%',
     textAlign: 'center',
+    // backgroundColor: 'blue',
   },
   listContainer: {
     marginHorizontal: 10,
     height: '100%',
   },
   orderItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    paddingVertical: 10,
-    margin: 1
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   nameProd: {
     color: 'white',
-    width: '30%',
+    width: '50%',
     textAlign: 'center',
-    // backgroundColor: 'gray',
+    justifyContent: "center"
   },
   priceContainer: {
     color: 'white',
-    width: '20%',
+    width: '30%',
     alignItems: 'center',
-    // backgroundColor: 'gray',
+    justifyContent: "center"
   },
   buttonAction: {
     width: '20%',
-    textAlign: 'center',
+    justifyContent: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
   },
   button: {
-    marginHorizontal: 5,
+    // marginHorizontal: 5,
   },
   noOrdersText: {
     textAlign: 'center',

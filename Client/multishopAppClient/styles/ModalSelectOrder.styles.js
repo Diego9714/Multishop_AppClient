@@ -9,12 +9,12 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#FFFFFF',
-    width: '60%',
+    width: '80%',
     borderRadius: 10,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
+    padding: 15,
   },
   modalTitle: {
     fontSize: 20,

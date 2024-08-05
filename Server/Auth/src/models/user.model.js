@@ -13,13 +13,20 @@ export class Users {
 
       const connection = await pool.getConnection()
 
-      let sql = 'SELECT id_scli , cod_cli , user_cli , pass_cli , existenceStatus , nom_cli , dir1_cli , tel_cli FROM scli WHERE user_cli = ?;'
+      let sql = `
+        SELECT id_scli, cod_cli, user_cli, AES_DECRYPT(pass_cli, 'multishoppcli') AS pass_cli, existenceStatus, nom_cli, dir1_cli, tel_cli
+        FROM scli
+        WHERE user_cli = ?;
+      `;
       let [user] = await connection.execute(sql,[username.toUpperCase()])
       
       connection.release()
 
       if(user) {
-        let isMatch = await bcrypt.compare(password.toUpperCase() , user[0].pass_cli)
+        let pass = password.toUpperCase()
+
+        let decryptedPassword = pass.toString('utf8');
+        let isMatch = decryptedPassword === password.toUpperCase();
 
         // let newPass = password.toUpperCase()
         // console.log(newPass)

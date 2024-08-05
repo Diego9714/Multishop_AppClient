@@ -1,123 +1,218 @@
-// Dependencies
-import React , {useState}                                                from 'react'
-import { Modal, View, Text, TouchableOpacity, ScrollView , Pressable, ImageBackground }  from 'react-native'
-import { AntDesign, MaterialIcons, FontAwesome }        from '@expo/vector-icons'
-
-import { LinearGradient }                                   from 'expo-linear-gradient'
-import DateTimePicker from '@react-native-community/datetimepicker';
-// Styles
-import styles                                               from '../../styles/ReportModal.styles'
-import { images } from '../../constants'
-
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, ScrollView, Pressable, ImageBackground, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from '../../styles/ReportModal.styles';
+import { images } from '../../constants';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import ModalFilterProducts from './ModalFilterProducts';
 
 const ReportProducts = ({ isVisible, onClose }) => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [isStartDatePickerVisible, setIsStartDatePickerVisible] = useState(false);
-  const [isEndDatePickerVisible, setIsEndDatePickerVisible] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [filters, setFilters] = useState({
+    selectedCategory: [],
+    selectedPriceOrder: null,
+  });
+  const [searchProduct, setSearchProduct] = useState('');
+  const [displaySearchProduct, setDisplaySearchProduct] = useState('');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
 
-  const showStartDatePicker = () => setIsStartDatePickerVisible(true);
-  const hideStartDatePicker = () => setIsStartDatePickerVisible(false);
+  useEffect(() => {
+    fetchOrders();
+  }, [filters]);
 
-  const showEndDatePicker = () => setIsEndDatePickerVisible(true);
-  const hideEndDatePicker = () => setIsEndDatePickerVisible(false);
+  useEffect(() => {
+    applyFilters();
+  }, [page, products, displaySearchProduct, filters]);
 
-  const handleStartDateChange = (event, selectedDate) => {
-    if (selectedDate) {
-      setStartDate(selectedDate);
-      hideStartDatePicker();
+  const fetchOrders = async () => {
+    try {
+      const synchronizedOrdersString = await AsyncStorage.getItem('SynchronizedOrders');
+      const synchronizedOrders = synchronizedOrdersString ? JSON.parse(synchronizedOrdersString) : [];
+      aggregateProducts(synchronizedOrders);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
     }
   };
 
-  const handleEndDateChange = (event, selectedDate) => {
-    if (selectedDate) {
-      setEndDate(selectedDate);
-      hideEndDatePicker();
+  const aggregateProducts = (orders) => {
+    const productMap = {};
+
+    orders.forEach(order => {
+      order.products.forEach(product => {
+        if (productMap[product.codigo]) {
+          productMap[product.codigo].quantity += product.quantity;
+        } else {
+          productMap[product.codigo] = { ...product };
+        }
+      });
+    });
+
+    let allProducts = Object.values(productMap);
+
+    // Apply filters
+    if (filters.selectedCategory.length > 0) {
+      allProducts = allProducts.filter(product => filters.selectedCategory.includes(product.category));
+    }
+
+    if (filters.selectedPriceOrder) {
+      allProducts.sort((a, b) => {
+        if (filters.selectedPriceOrder === 'menor-mayor') {
+          return a.price - b.price;
+        } else if (filters.selectedPriceOrder === 'mayor-menor') {
+          return b.price - a.price;
+        }
+        return 0;
+      });
+    }
+
+    setProducts(allProducts);
+  };
+
+  const applyFilters = () => {
+    let filteredProducts = products.slice();
+
+    // Filtrar por nombre del producto
+    if (displaySearchProduct.length >= 3) {
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
+      filteredProducts = filteredProducts.filter(product => {
+        const productDescrip = product.descrip.toLowerCase();
+        return searchTerms.every(term => productDescrip.includes(term));
+      });
+
+      // Mostrar alerta si no se encontraron productos
+      if (filteredProducts.length === 0) {
+        Alert.alert('Producto no encontrado', 'No se encontró ningún producto con ese nombre.');
+        setSearchProduct('');
+        setDisplaySearchProduct('');
+        setPage(1);
+        return;
+      }
+    }
+
+    // Paginación
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    setVisibleProducts(filteredProducts.slice(start, end));
+
+    // Ajustar la página si no hay suficientes productos para la página actual
+    if (filteredProducts.length > 0 && page > Math.ceil(filteredProducts.length / itemsPerPage)) {
+      setPage(1);
     }
   };
 
-  const handleFilter = () => {
-    // Formatear las fechas en un formato legible o necesario
-    const formattedStartDate = startDate.toISOString().split('T')[0];
-    const formattedEndDate = endDate.toISOString().split('T')[0];
-    console.log('Start Date:', formattedStartDate);
-    console.log('End Date:', formattedEndDate);
-    // Agregar lógica de filtrado aquí
+  const handleFilterPress = () => {
+    setFilterModalVisible(true);
+  };
+
+  const handleSaveFilters = (newFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  const handleSearch = () => {
+    if (searchProduct.length === 0) {
+      setDisplaySearchProduct('');
+      setPage(1);
+      return;
+    }
+
+    if (searchProduct.length < 3) {
+      Alert.alert('Por favor ingrese al menos tres letras para buscar');
+      return;
+    }
+
+    setDisplaySearchProduct(searchProduct);
+    setPage(1);
+  };
+
+  const renderElements = ({ item }) => (
+    <View style={styles.productItem}>
+      <View style={styles.nameProd}>
+        <Text>{item.descrip}</Text>
+      </View>
+      <View style={styles.priceContainer}>
+        <Text>{item.quantity}</Text>
+      </View>
+      <View style={styles.buttonAction}>
+        <Text>{item.quantity}</Text>
+      </View>
+    </View>
+  );
+
+  const renderPaginationButtons = () => {
+    const totalPages = Math.min(Math.ceil(products.length / itemsPerPage), 5);
+
+    let buttons = [];
+    let startPage = Math.max(1, page - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <Pressable
+          key={i}
+          style={[styles.pageButton, page === i && styles.pageButtonActive]}
+          onPress={() => setPage(i)}
+        >
+          <Text style={[styles.pageButtonText, page === i && styles.pageButtonTextActive]}>
+            {i}
+          </Text>
+        </Pressable>
+      );
+    }
+    return buttons;
   };
 
   return (
     <Modal transparent={true} visible={isVisible} onRequestClose={onClose} animationType="slide">
-      <ImageBackground
-        source={images.fondo}
-        style={styles.gradientBackground}
-      >
+      <ImageBackground source={images.fondo} style={styles.gradientBackground}>
         <View style={styles.container}>
           <View style={styles.mainTitleContainer}>
             <Text style={styles.mainTitle}>Historial de Productos</Text>
           </View>
 
-          {/* <Text style={styles.mainSubtitle}>Buscar</Text> */}
-
-          <View style={styles.buttonsDateAction}>
-            <TouchableOpacity style={styles.buttonDate} onPress={showStartDatePicker}>
-              <Text style={styles.buttonTextDate}>
-                Desde: {startDate.toISOString().split('T')[0]}
-              </Text>
-            </TouchableOpacity>
-
-            {isStartDatePickerVisible && (
-              <DateTimePicker
-                value={startDate}
-                mode="date"
-                display="default"
-                onChange={handleStartDateChange}
+          <View style={styles.finderContainer}>
+            <View style={styles.seekerContainer}>
+              <TextInput
+                placeholder='Buscar Producto'
+                style={styles.seeker}
+                value={searchProduct}
+                onChangeText={(text) => setSearchProduct(text)}
               />
-            )}
-
-            <TouchableOpacity style={styles.buttonDate} onPress={showEndDatePicker}>
-              <Text style={styles.buttonTextDate}>
-                Hasta:  {endDate.toISOString().split('T')[0]}
-              </Text>
+              <Pressable onPress={handleSearch}>
+                <FontAwesome name="search" size={28} color="#8B8B8B" />
+              </Pressable>
+            </View>
+            <TouchableOpacity style={styles.filterContainer} onPress={handleFilterPress}>
+              <Text style={styles.textFilter}>Filtrar</Text>
+              <MaterialIcons name="filter-alt" size={28} color="white" />
             </TouchableOpacity>
-
-            {isEndDatePickerVisible && (
-              <DateTimePicker
-                value={endDate}
-                mode="date"
-                display="default"
-                onChange={handleEndDateChange}
-              />
-            )}
           </View>
 
           <View style={styles.productContainer}>
             <View style={styles.headerProductContainer}>
               <View style={styles.titleListContainer}>
-                <Text style={styles.titleListClient}>Cliente</Text>
-                <Text style={styles.titleListPrice}>Total a pagar</Text>
-                <Text style={styles.titleListActions}>Acciones</Text>
+                <Text style={styles.titleListClient}>Producto</Text>
+                <Text style={styles.titleListPrice}>Cantidad</Text>
+                <Text style={styles.titleListActions}>Total (USD)</Text>
               </View>
             </View>
 
-            <ScrollView>
-              {/* {visibleProducts.map((product, index) => ( */}
-                <View style={styles.productItem}>
-                  <View style={styles.nameProd}>
-                    <Text>producto</Text>
-                  </View>
-                  
-                  <View style={styles.buttonAction}>
-                  
-                    <Pressable
-                      style={styles.buttonMore}
-                      
-                    >
-                      <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
-                    </Pressable>
-                  </View>
-                </View>
-              {/* ))} */}
-            </ScrollView>
+            <FlatList
+              data={visibleProducts}
+              keyExtractor={(item) => item.codigo}
+              renderItem={renderElements}
+            />
+          </View>
+
+          <View style={styles.paginationContainer}>
+            {renderPaginationButtons()}
           </View>
 
           <View style={styles.buttonsAction}>
@@ -125,11 +220,15 @@ const ReportProducts = ({ isVisible, onClose }) => {
               <Text style={styles.buttonText}>Salir</Text>
             </Pressable>
           </View>
-
         </View>
+        <ModalFilterProducts
+          visible={isFilterModalVisible}
+          onClose={() => setFilterModalVisible(false)}
+          onSave={handleSaveFilters}
+        />
       </ImageBackground>
     </Modal>
-  )
-}
+  );
+};
 
-export default ReportProducts
+export default ReportProducts;

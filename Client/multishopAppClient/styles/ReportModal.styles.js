@@ -45,27 +45,93 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000'
   },
+    finderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: "90%",
+    backgroundColor: '#38B0DB',
+    paddingRight: 15,
+    borderRadius: 15,
+    margin: 15,
+  },
+  seekerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    width: "75%",
+    borderRadius: 15,
+    paddingHorizontal: 10,
+  },
+  seeker: {
+    padding: 5,
+    height: 50,
+    borderRadius: 15,
+    width: "85%",
+    textAlign: 'justify'
+  },
+  filterContainer:{
+    width: '22%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 5
+  },
+  textFilter:{
+    color:'white'
+  },
+  filterIndicator: {
+    position: 'absolute',
+    top: -15,
+    right: -15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+    opacity: 0.7
+  },
   buttonsAction: {
     marginTop: "5%",
     flexDirection: "row",
-    gap: 30,
+    gap: 20,
     marginBottom: '5%'
   },
   buttonsDateAction: {
     display: "flex",
-    marginTop: "5%",
     flexDirection: "row",
-    gap: 30,
+    marginTop: "5%",
+    gap: 20,
     marginBottom: '5%'
   },
   dateSelectorsContainer:{
     display: 'flex',
     flexDirection: 'row',
-    gap: 10,
+    gap: 5,
     paddingHorizontal: 20,
   },
   buttonDate: {
-    width: 120,
+    display: "flex",
+    flexDirection: "row",
+    width: 140,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 6,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 5,
+      height: 5,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  buttonStats : {
+    display: "flex",
+    flexDirection: "row",
+    width: 160,
     backgroundColor: '#fff',
     borderRadius: 10,
     justifyContent: 'center',
@@ -89,7 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   buttonSearch: {
-    width: 40,
+    width: 35,
     backgroundColor: '#fff',
     borderRadius: 10,
     justifyContent: 'center',
@@ -126,6 +192,7 @@ const styles = StyleSheet.create({
     color: "#6b6b6b",
     textAlign: "center",
     lineHeight: 25,
+    marginLeft: 5
   },
   buttonTextSearch:{
     color: "#6b6b6b",
@@ -141,8 +208,7 @@ const styles = StyleSheet.create({
   // LISTA DE PRODUCTOS
   productContainer:{
     height: "56%",
-    width: "90%",
-    // margin: 50,
+    width: "95%",
     backgroundColor: 'rgba(255, 255, 255, 1)',
     borderRadius: 20,
   },
@@ -157,49 +223,47 @@ const styles = StyleSheet.create({
     display: "flex",
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
+    // justifyContent: "space-evenly",
+    justifyContent: "center",
+    // gap: 20,
     paddingVertical: 15,
   },
   titleListClient: {
     color: 'white',
-    width: '30%',
+    width: '50%',
     textAlign: 'center',
+    // backgroundColor: 'gray',
   },
   titleListPrice: {
     color: 'white',
-    width: '30%',
+    width: '25%',
     textAlign: 'center',
-
+    // backgroundColor: 'gray',
   },
   titleListActions: {
     color: 'white',
-    width: '20%',
+    width: '25%',
     textAlign: 'center',
+    // backgroundColor: 'gray',
   },
   productItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    paddingVertical: 10,
-    margin: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
   nameProd: {
-    width: '35%',
-    textAlign: 'center',
-    justifyContent: 'center',
-    // backgroundColor: 'gray',
-  },
-  nameProducts: {
-    textAlign: 'center',
-    justifyContent: 'center',
-    // backgroundColor: 'gray',
+    width: '50%',
+    justifyContent: "center",
   },
   priceContainer: {
-    width: '33.3%',
+    width: '30%',
     alignItems: 'center',
+    justifyContent: "center"
     // backgroundColor: 'gray',
   },
   quantityInput: {
@@ -211,24 +275,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonAction: {
-    width: '25%',
+    width: '20%',
     alignItems: 'center',
+    justifyContent: 'center',
     // backgroundColor: 'gray'
   },
-  buttonMore: {
-    // padding: 5,
-    // marginRight: 15,
-  },
-  // centerButtonPlaceholder: {
-  //   width: 30, // mismo ancho que el icono delete para mantener el espacio consistente
-  //   height: 30,
-  // },
-  pagination: {
-    // height: '8%',
-    width: '100%',
+  paginationContainer: {
+    width: '90%',
     flexDirection: 'row',
-    paddingHorizontal: '24%', 
-    paddingVertical: 10
+    marginHorizontal: '5%',
+    paddingHorizontal: '20%', 
+    paddingVertical: 10,
   },
   pageButton: {
     // height: '22%',
@@ -240,6 +297,7 @@ const styles = StyleSheet.create({
   },
   pageButtonActive: {
     backgroundColor: '#38B0DB',
+    
   },
   pageButtonText: {
     color: '#38B0DB',

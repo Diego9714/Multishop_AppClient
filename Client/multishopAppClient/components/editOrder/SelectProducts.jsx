@@ -358,7 +358,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
             <View style={styles.headerProductContainer}>
               <View style={styles.titleListContainer}>
                 <Text style={styles.titleListProduct}>Producto</Text>
-                <Text style={styles.titleListCant}>Cantidad</Text>
+                {/* <Text style={styles.titleListCant}>Cantidad</Text> */}
                 <Text style={styles.titleListActions}>Acciones</Text>
               </View>
             </View>
@@ -377,9 +377,8 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
                       value={String(productQuantities[product.codigo] || '')}
                       onChangeText={text => handleQuantityChange(product.codigo, text)}
                     />
-                  </View>
-                  <View style={styles.buttonAction}>
-                    {productQuantities[product.codigo] > 0 && (
+
+                      {productQuantities[product.codigo] > 0 && (
                       <Pressable
                         style={styles.button}
                         onPress={() => handleProductDelete(product.codigo)}
@@ -396,7 +395,11 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
                     >
                       <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
                     </Pressable>
+
                   </View>
+                  {/* <View style={styles.buttonAction}>
+
+                  </View> */}
                 </View>
               ))}
             </ScrollView>

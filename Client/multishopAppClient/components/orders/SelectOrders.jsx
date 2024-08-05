@@ -236,7 +236,6 @@ const SelectOrders = () => {
     }
   }
   
-  
   const renderPaginationButtons = () => {
     const numberOfPages = Math.ceil(orders.length / itemsPerPage)
     let buttons = []
@@ -298,7 +297,7 @@ const SelectOrders = () => {
       setEditModalVisible(true)
     }
   }
-
+  
   return (
     <ImageBackground
       source={images.fondo}
@@ -312,8 +311,8 @@ const SelectOrders = () => {
         <View style={styles.listOrderContainer}>
           <View style={styles.headerProductContainer}>
             <View style={styles.titleListContainer}>
-              <Text style={styles.titleListClient}>Cliente</Text>
-              <Text style={styles.titleListPrice}>Total a pagar</Text>
+              <Text style={styles.titleListClient}>Nro Pedido</Text>
+              <Text style={styles.titleListPrice}>Fecha</Text>
               <Text style={styles.titleListActions}>Acciones</Text>
             </View>
           </View>
@@ -323,10 +322,12 @@ const SelectOrders = () => {
               visibleOrders.map((order, index) => (
                 <View key={index} style={styles.orderItem}>
                   <View style={styles.nameProd}>
-                    <Text>{order.nom_cli}</Text>
+                    <Text>{order.id_order}</Text>
                   </View>
                   <View style={styles.priceContainer}>
-                    <Text>{formatNumber(order.totalUsd)} $</Text>
+                    <Text>
+                      {order.fecha}
+                    </Text>
                   </View>
                   <View style={styles.buttonAction}>
                     <Pressable

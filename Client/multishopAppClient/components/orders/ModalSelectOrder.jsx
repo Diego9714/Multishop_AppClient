@@ -16,17 +16,21 @@ const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder }) => {
     onClose();
   };
 
-  const formatNumber = (number) => {
-    return number.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const year = date.getFullYear();
+  //   return `${day}/${month}/${year}`;
+  // };
 
   return (
     <Modal visible={isVisible && !!selectedOrder} animationType="fade" transparent={true}>
       {selectedOrder && (
         <View style={styles.modalContainer}>
           <View style={styles.container}>
-            <Text style={styles.modalTitle}>{selectedOrder.nom_cli}</Text>
-            <Text style={styles.modalTitle}>{formatNumber(selectedOrder.totalUsd)}$</Text>
+            <Text style={styles.modalTitle}>{selectedOrder.id_order}</Text>
+            <Text style={styles.modalTitle}>{selectedOrder.fecha}</Text>
 
             <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Eliminar')}>
               <Text style={styles.modalButtonText}>Eliminar</Text>

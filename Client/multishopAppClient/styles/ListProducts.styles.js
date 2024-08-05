@@ -94,14 +94,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   listContainer: {
-    marginHorizontal: 10,
     height: '85%',
   },
   productItem: {
+    width: "100%",
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   nameProd: {
     textAlign: "justify",

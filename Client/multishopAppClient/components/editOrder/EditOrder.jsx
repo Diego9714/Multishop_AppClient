@@ -318,7 +318,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           <thead>
             <tr class="date">
               <td><strong>${dataCompany[0].nom_emp}</strong></td>
-              <td class="datePdf">Fecha: ${fechaFormateada}</td>
+              <td class="datePdf">Fecha: ${order.fecha}</td>
             </tr>
 
             <tr class="date">
@@ -411,7 +411,14 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
     }
   };
 
-  const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const year = date.getFullYear();
+  //   return `${day}/${month}/${year}`;
+  // };
+  // const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
 
   return (
     <Modal visible={isVisible} animationType="slide">
@@ -446,13 +453,9 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                   </View>
                   <Text style={styles.nameInputDetailedClient}>Fecha del Pedido:</Text>
                   <View style={styles.infoClientContainer}>
-                    <Text style={styles.textDetailedClient}>{fechaFormateada}</Text>
+                    <Text style={styles.textDetailedClient}>{order.fecha}</Text>
                   </View>
                 </View>
-{/* 
-                <View style={styles.mainTitleContainer}>
-                  <Text style={styles.mainTitle}>Tipo de Factura</Text>
-                </View> */}
 
                 <View style={styles.detailedClientContainerFac}>
                   <View
@@ -460,7 +463,6 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                     onPress={() => setIsInvoiceModalVisible(true)}
                   >
                     <Text style={styles.textDetailedClient}>
-                      {/* {invoiceType ? invoiceType : selectedOrder.tipfac} */}
                       Orden
                     </Text>
                   </View>

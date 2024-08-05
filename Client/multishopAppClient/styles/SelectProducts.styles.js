@@ -161,11 +161,14 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   // LISTA DE PRODUCTOS
+  
   productContainer:{
-    height: "56%",
-    width: "90%",
+    height: "58%",
+    width: "96%",
+    // padding: 2,
     // margin: 50,
     backgroundColor: 'rgba(255, 255, 255, 1)',
+    // backgroundColor: 'gray',
     borderRadius: 20,
   },
   headerProductContainer:{
@@ -185,38 +188,46 @@ const styles = StyleSheet.create({
   },
   titleListProduct:{
     color: 'white',
-    width: '36%',
-    // backgroundColor: 'black'
+    width: '40%',
+    textAlign: 'center'
   },
   titleListCant:{
     color: 'white',
-    // width: '36%',
-    // backgroundColor: 'black'
   },
   titleListActions:{
     color: 'white',
-    // width: '36%',
-    // backgroundColor: 'black'
   },
   productItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10,
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
     paddingVertical: 15,
+    paddingHorizontal: 2,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+  },
+  listContainer: {
+    height: '85%',
   },
   nameProd: {
-    width: '45%'
+    width: '56%',
+    justifyContent: 'center',
+    // backgroundColor: 'gray',
   },
   quantityContainer: {
-    width: '30%',
+    width: '42%',
+    // backgroundColor: 'gray',
+    justifyContent: 'center',
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   quantityInput: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    paddingHorizontal: 5,
+    paddingHorizontal: 3,
     paddingVertical: 3,
     textAlign: 'center',
   },
@@ -226,11 +237,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    padding: 5,
+    marginLeft: 10
   },
   buttonMore: {
-    padding: 5,
-    marginRight: 15,
+    // padding: 5,
+    // marginRight: 15,
   },
   centerButtonPlaceholder: {
     width: 30, // mismo ancho que el icono delete para mantener el espacio consistente
