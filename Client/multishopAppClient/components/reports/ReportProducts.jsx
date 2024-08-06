@@ -11,21 +11,32 @@ const ReportProducts = ({ isVisible, onClose }) => {
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [filters, setFilters] = useState({
-    selectedCategory: [],
     selectedPriceOrder: null,
+    selectedQuantityOrder: null,
   });
   const [searchProduct, setSearchProduct] = useState('');
   const [displaySearchProduct, setDisplaySearchProduct] = useState('');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const [isFiltering, setIsFiltering] = useState(false);
 
   useEffect(() => {
     fetchOrders();
-  }, [filters]);
+
+    const intervalId = setInterval(() => {
+      fetchOrders();
+    }, 10000)
+  
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     applyFilters();
   }, [page, products, displaySearchProduct, filters]);
+
+  useEffect(() => {
+    setIsFiltering(filters.selectedPriceOrder !== null || filters.selectedQuantityOrder !== null);
+  }, [filters.selectedPriceOrder, filters.selectedQuantityOrder]);
 
   const fetchOrders = async () => {
     try {
@@ -39,7 +50,7 @@ const ReportProducts = ({ isVisible, onClose }) => {
 
   const aggregateProducts = (orders) => {
     const productMap = {};
-
+  
     orders.forEach(order => {
       order.products.forEach(product => {
         if (productMap[product.codigo]) {
@@ -49,31 +60,29 @@ const ReportProducts = ({ isVisible, onClose }) => {
         }
       });
     });
-
+  
     let allProducts = Object.values(productMap);
-
-    // Apply filters
-    if (filters.selectedCategory.length > 0) {
-      allProducts = allProducts.filter(product => filters.selectedCategory.includes(product.category));
-    }
-
+  
+    // Filtrar por precio
     if (filters.selectedPriceOrder) {
       allProducts.sort((a, b) => {
-        if (filters.selectedPriceOrder === 'menor-mayor') {
-          return a.price - b.price;
-        } else if (filters.selectedPriceOrder === 'mayor-menor') {
-          return b.price - a.price;
+        const priceA = a.quantity * a.priceUsd;
+        const priceB = b.quantity * b.priceUsd;
+        if (filters.selectedPriceOrder === 'precio-menor') {
+          return priceA - priceB;
+        } else if (filters.selectedPriceOrder === 'precio-mayor') {
+          return priceB - priceA;
         }
         return 0;
       });
     }
-
+  
     setProducts(allProducts);
   };
 
   const applyFilters = () => {
     let filteredProducts = products.slice();
-
+  
     // Filtrar por nombre del producto
     if (displaySearchProduct.length >= 3) {
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
@@ -81,8 +90,7 @@ const ReportProducts = ({ isVisible, onClose }) => {
         const productDescrip = product.descrip.toLowerCase();
         return searchTerms.every(term => productDescrip.includes(term));
       });
-
-      // Mostrar alerta si no se encontraron productos
+  
       if (filteredProducts.length === 0) {
         Alert.alert('Producto no encontrado', 'No se encontró ningún producto con ese nombre.');
         setSearchProduct('');
@@ -91,13 +99,38 @@ const ReportProducts = ({ isVisible, onClose }) => {
         return;
       }
     }
-
+  
+    // Filtrar por precio
+    if (filters.selectedPriceOrder) {
+      filteredProducts.sort((a, b) => {
+        const priceA = a.quantity * a.priceUsd;
+        const priceB = b.quantity * b.priceUsd;
+        if (filters.selectedPriceOrder === 'precio-menor') {
+          return priceA - priceB;
+        } else if (filters.selectedPriceOrder === 'precio-mayor') {
+          return priceB - priceA;
+        }
+        return 0;
+      });
+    }
+  
+    // Aplicar el filtro de cantidad
+    if (filters.selectedQuantityOrder) {
+      filteredProducts.sort((a, b) => {
+        if (filters.selectedQuantityOrder === 'cantidad-menor') {
+          return a.quantity - b.quantity;
+        } else if (filters.selectedQuantityOrder === 'cantidad-mayor') {
+          return b.quantity - a.quantity;
+        }
+        return 0;
+      });
+    }
+  
     // Paginación
     const start = (page - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     setVisibleProducts(filteredProducts.slice(start, end));
-
-    // Ajustar la página si no hay suficientes productos para la página actual
+  
     if (filteredProducts.length > 0 && page > Math.ceil(filteredProducts.length / itemsPerPage)) {
       setPage(1);
     }
@@ -137,7 +170,7 @@ const ReportProducts = ({ isVisible, onClose }) => {
         <Text>{item.quantity}</Text>
       </View>
       <View style={styles.buttonAction}>
-        <Text>{item.quantity}</Text>
+        <Text>{(item.quantity * item.priceUsd).toFixed(2).replace('.', ',')}</Text>
       </View>
     </View>
   );
@@ -192,6 +225,9 @@ const ReportProducts = ({ isVisible, onClose }) => {
             <TouchableOpacity style={styles.filterContainer} onPress={handleFilterPress}>
               <Text style={styles.textFilter}>Filtrar</Text>
               <MaterialIcons name="filter-alt" size={28} color="white" />
+              {isFiltering && (
+                <FontAwesome name="circle" size={20} color="red" style={styles.filterIndicator} />
+              )}
             </TouchableOpacity>
           </View>
 
@@ -225,6 +261,7 @@ const ReportProducts = ({ isVisible, onClose }) => {
           visible={isFilterModalVisible}
           onClose={() => setFilterModalVisible(false)}
           onSave={handleSaveFilters}
+          initialFilters={filters}
         />
       </ImageBackground>
     </Modal>

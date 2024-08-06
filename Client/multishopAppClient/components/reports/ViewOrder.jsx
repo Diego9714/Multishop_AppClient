@@ -54,8 +54,6 @@ const ViewOrder = ({ isVisible, onClose, selectedOrder }) => {
     return `Pedido_${selectedOrder.id_order}.pdf`;
   };
 
-  const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
-
   const handleGenerateAndSharePdf = async () => {
     if (!order || !order.products || order.products.length === 0) {
       Alert.alert('Agrega al menos un producto antes de guardar.');
@@ -148,7 +146,7 @@ const ViewOrder = ({ isVisible, onClose, selectedOrder }) => {
           <thead>
             <tr class="date">
               <td><strong>${dataCompany[0].nom_emp}</strong></td>
-              <td class="datePdf">Fecha: ${fechaFormateada}</td>
+              <td class="datePdf">Fecha: ${order.fecha}</td>
             </tr>
 
             <tr class="date">
@@ -296,14 +294,6 @@ const ViewOrder = ({ isVisible, onClose, selectedOrder }) => {
                         <Text style={styles.titleListPrice}>Precio</Text>
                       </View>
                     </View>
-                    {/* {order.products.map(product => (
-                      <View key={product.id} style={styles.tableRow}>
-                        <Text style={styles.tableCell}>{product.descrip}</Text>
-                        <Text style={styles.tableCell}>{product.quantity}</Text>
-                        <Text style={styles.tableCell}>{formatNumber(product.priceUsd)}</Text>
-                        <Text style={styles.tableCell}>{formatNumber(product.quantity * product.priceUsd)}</Text>
-                      </View>
-                    ))} */}
                     <View>
                     {order.products && order.products.map((product, index) => (
                       <View key={index} style={styles.selectedProductItem}>
@@ -338,7 +328,10 @@ const ViewOrder = ({ isVisible, onClose, selectedOrder }) => {
 
               </View>
             ) : (
-              <Text>No se seleccionó ningún pedido</Text>
+              <Pressable onPress={onClose} style={styles.closeButtonReport}>
+                <Text style={styles.buttonText}>Salir</Text>
+              </Pressable>
+          
             )}
           </ScrollView>
         </View>

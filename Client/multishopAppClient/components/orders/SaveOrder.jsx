@@ -395,7 +395,7 @@ const SaveOrder = ({ isVisible, onClose, order, onQuantityChange, onDeleteProduc
           </tbody>
       </table>
       <p class="note">
-        Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.
+        Nota: ${dataCompany[0].noteOrder}
       </p>
     </div>
     </body>

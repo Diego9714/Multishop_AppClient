@@ -217,13 +217,15 @@ const styles = StyleSheet.create({
   },
   quantityContainer: {
     width: '42%',
+    // marginLeft: 2,
     // backgroundColor: 'gray',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
   },
   quantityInput: {
+    marginLeft: 25,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,

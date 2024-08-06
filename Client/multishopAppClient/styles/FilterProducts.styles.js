@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    width: '70%',
+    width: '80%',
     borderRadius: 10,
     display: 'flex',
     alignItems: 'center',
@@ -28,9 +28,14 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 15,
     borderRadius: 15,
-    width: "85%",
+    width: "90%",
     backgroundColor: '#fff',
-    gap: 10
+    gap: 10,
+    alignItems: 'center',
+  },
+  filterText:{
+    alignItems: 'center',
+    justifyContent: "center"
   },
   sectionButtonsModal: {
     marginTop: "2%",

@@ -58,6 +58,22 @@ const getCurrency = async (signal) => {
   }
 };
 
+const getCompany = async (signal) => {
+  try {
+    const res = await instanceProducts.get(`/api/company`, { signal });
+    const listCompany = res.data.company;
+    await storeData('company', listCompany);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get company was aborted.');
+    } else {
+      console.error('Error fetching company:', error);
+    }
+    return { success: false, error };
+  }
+};
+
 const getAllInfo = async (setLoading, setMessage) => {
   setLoading(true);
   setMessage('');
@@ -78,7 +94,8 @@ const getAllInfo = async (setLoading, setMessage) => {
       const results = await Promise.all([
         getProducts(signal),
         getCategories(signal),
-        getCurrency(signal)
+        getCurrency(signal),
+        getCompany(signal)
       ]);
 
       clearTimeout(timeoutId);

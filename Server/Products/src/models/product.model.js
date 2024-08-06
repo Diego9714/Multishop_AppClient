@@ -144,7 +144,7 @@ export class Products {
 
       const connection = await pool.getConnection()
 
-      let sql = `SELECT rif_emp , nom_emp , dir1_emp FROM empresa;`
+      let sql = `SELECT rif_emp , nom_emp , dir1_emp , noteOrder FROM empresa;`
       let [company] = await connection.execute(sql)
       
       connection.release()

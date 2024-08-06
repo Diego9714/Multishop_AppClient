@@ -5,38 +5,43 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import styles from '../../styles/ReportModal.styles';
 import { images } from '../../constants';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-import ModalSelectOrder from './ModalSelectOrder'; // Asegúrate de importar el modal
-import ViewOrder from './ViewOrder'; // Asegúrate de importar el modal de visualización
+import ModalSelectOrder from './ModalSelectOrder';
+import ViewOrder from './ViewOrder';
 
 const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
 
 const ReportOrders = ({ isVisible, onClose }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [dateType, setDateType] = useState('start'); // 'start' or 'end'
+  const [dateType, setDateType] = useState('start');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null); // New state for the selected order
-  const [isModalSelectVisible, setIsModalSelectVisible] = useState(false); // New state for ModalSelectOrder visibility
-  const [isViewOrderVisible, setIsViewOrderVisible] = useState(false); // New state for ViewOrder visibility
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalSelectVisible, setIsModalSelectVisible] = useState(false);
+  const [isViewOrderVisible, setIsViewOrderVisible] = useState(false);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
   const handleDateChange = (event, selectedDate) => {
+    // If user cancels the date picker, event is undefined
+    if (event.type === 'dismissed') {
+      setShowDatePicker(false);
+      return;
+    }
+    
     if (selectedDate) {
       if (dateType === 'start') {
         setStartDate(selectedDate);
-        setShowDatePicker(false);
       } else {
         setEndDate(selectedDate);
-        setShowDatePicker(false);
       }
+      setShowDatePicker(false);
     }
   };
 
@@ -58,7 +63,7 @@ const ReportOrders = ({ isVisible, onClose }) => {
     });
 
     setFilteredOrders(filtered);
-    setPage(1); // Reset page to 1 when filtering
+    setPage(1);
   };
 
   const handleReset = () => {
@@ -66,7 +71,7 @@ const ReportOrders = ({ isVisible, onClose }) => {
     setStartDate(null);
     setEndDate(null);
     setFilteredOrders(orders);
-    setPage(1); // Reset page to 1 when resetting
+    setPage(1);
   };
 
   const handleOpenModalSelect = (order) => {
@@ -81,7 +86,7 @@ const ReportOrders = ({ isVisible, onClose }) => {
   const handleOpenViewOrder = (order) => {
     setSelectedOrder(order);
     setIsViewOrderVisible(true);
-    handleCloseModalSelect(); // Close the select modal when opening view order
+    handleCloseModalSelect();
   };
 
   const handleCloseViewOrder = () => {
@@ -99,11 +104,23 @@ const ReportOrders = ({ isVisible, onClose }) => {
       const synchronizedOrdersString = await AsyncStorage.getItem('SynchronizedOrders');
       const synchronizedOrders = synchronizedOrdersString ? JSON.parse(synchronizedOrdersString) : [];
       setOrders(synchronizedOrders);
-      setFilteredOrders(synchronizedOrders);
+      setFilteredOrders((prev) => {
+        // If no filters are applied, update filteredOrders; otherwise, keep previous filtered state
+        if (startDate === null && endDate === null) {
+          return synchronizedOrders;
+        }
+        return prev;
+      });
     };
 
     getOrders();
-  }, []);
+
+    const intervalId = setInterval(() => {
+      getOrders();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [startDate, endDate]); // Depend on startDate and endDate to fetch and update orders
 
   const applyPagination = () => {
     const start = (page - 1) * itemsPerPage;
@@ -134,7 +151,13 @@ const ReportOrders = ({ isVisible, onClose }) => {
 
   return (
     <>
-      <Modal transparent={true} visible={isVisible} onRequestClose={onClose} animationType="slide">
+      <Modal
+        transparent={true}
+        visible={isVisible}
+        onRequestClose={onClose}
+        animationType="slide"
+        onDismiss={() => setShowDatePicker(false)} // Close date picker on modal dismiss
+      >
         <ImageBackground source={images.fondo} style={styles.gradientBackground}>
           <View style={styles.container}>
             <View style={styles.mainTitleContainer}>
@@ -189,11 +212,7 @@ const ReportOrders = ({ isVisible, onClose }) => {
                       </View>
                       <View style={styles.priceContainer}>
                         <Text>
-                          {new Date(order.fecha).toLocaleDateString('es-ES', {
-                            day: '2-digit',
-                            month: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {order.fecha}
                         </Text>
                       </View>
                       <View style={styles.buttonAction}>
@@ -225,8 +244,8 @@ const ReportOrders = ({ isVisible, onClose }) => {
       <ModalSelectOrder
         isVisible={isModalSelectVisible}
         onClose={handleCloseModalSelect}
-        order={selectedOrder}
         onAction={handleAction}
+        selectedOrder={selectedOrder}
       />
 
       <ViewOrder

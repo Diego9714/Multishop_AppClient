@@ -34,51 +34,82 @@ const SelectProducts = ({ isVisible, onClose }) => {
   const [isFiltering, setIsFiltering] = useState(false)
   const [prodExistence, setProdExistence] = useState(null)
   
-  useEffect(() => {
-    const getProducts = async () => {
-      const productsInfo = await AsyncStorage.getItem('products')
-      const productsJson = JSON.parse(productsInfo)
-      const filteredProducts = (productsJson || []).filter(product => product.existencia > 0)
-      setProducts(filteredProducts)
-    }
-    getProducts()
-
-    // const intervalId = setInterval(() => {
-    //   getProducts();
-    // }, 1000)
-  
-    // return () => clearInterval(intervalId);
-  }, [])  
-
   useFocusEffect(
     useCallback(() => {
       setIsSaveOrderModalVisible(false)
       fetchProducts();
+
     }, [])
   );
 
+  // Actualiza el contador de productos seleccionados cuando cambia productQuantities
   useEffect(() => {
-    let filteredProducts = products.filter(product => product.existencia > 0)
-  
+    const count = Object.values(productQuantities).filter(quantity => quantity > 0).length;
+    setSelectedProductsCount(count);
+  }, [productQuantities]);
+
+  // UseEffect para la actualización de productos
+  useEffect(() => {
+    const getProducts = async () => {
+      const productsInfo = await AsyncStorage.getItem('products');
+      const productsJson = JSON.parse(productsInfo);
+      const filteredProducts = (productsJson || []).filter(product => product.existencia > 0);
+
+      // Mantén la selección y las cantidades actuales
+      setProducts(prevProducts => {
+        const updatedProducts = filteredProducts.map(product => {
+          const existingProduct = prevProducts.find(p => p.codigo === product.codigo);
+          return existingProduct ? existingProduct : product;
+        });
+        return updatedProducts;
+      });
+    };
+
+    getProducts();
+
+    const intervalId = setInterval(() => {
+      getProducts();
+    }, 2000); // Actualiza cada 2 segundos
+
+    return () => clearInterval(intervalId);
+  }, []); // Solo se ejecuta al montar el componente
+
+  // UseEffect para aplicar filtros y paginación
+  useEffect(() => {
+    let filteredProducts = products.filter(product => product.existencia > 0);
+
+    // Aplica filtros
     if (displaySearchProduct.length >= 3) {
-      const searchWords = displaySearchProduct.toLowerCase().split(' ')
+      const searchWords = displaySearchProduct.toLowerCase().split(' ');
       filteredProducts = filteredProducts.filter(product =>
         searchWords.every(word => product.descrip.toLowerCase().includes(word))
-      )
+      );
     }
-  
-    const start = (page - 1) * itemsPerPage
-    const end = page * itemsPerPage
-    const paginatedProducts = filteredProducts.slice(start, end)
-  
-    const updatedVisibleProducts = paginatedProducts.map(product => ({
-      ...product,
-      quantity: productQuantities[product.codigo] || 0,
-      selected: product.codigo in productQuantities
-    }))
-  
-    setVisibleProducts(updatedVisibleProducts)
-  }, [page, products, displaySearchProduct, productQuantities])
+
+    if (searchCategory.length > 0) {
+      filteredProducts = filteredProducts.filter(product =>
+        searchCategory.some(category => product.ncate.includes(category))
+      );
+    }
+
+    // Ordena por precio si es necesario
+    if (priceOrder === 'menor-mayor') {
+      filteredProducts = filteredProducts.sort((a, b) => a.precioUsd - b.precioUsd);
+    } else if (priceOrder === 'mayor-menor') {
+      filteredProducts = filteredProducts.sort((a, b) => b.precioUsd - a.precioUsd);
+    }
+
+    // Paginación
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    setVisibleProducts(filteredProducts.slice(start, end));
+
+    // Ajusta la página si es necesario
+    if (filteredProducts.length > 0 && page > Math.ceil(filteredProducts.length / itemsPerPage)) {
+      setPage(1);
+    }
+  }, [page, products, displaySearchProduct, searchCategory, priceOrder]); // Dependencias necesarias
+
   
   useEffect(() => {
     applyFilters()
@@ -120,23 +151,26 @@ const SelectProducts = ({ isVisible, onClose }) => {
   }
 
   const handleProductSelection = useCallback((product) => {
-    const updatedProductQuantities = { ...productQuantities }
-
+    const updatedProductQuantities = { ...productQuantities };
+    
     if (product.selected) {
-      product.selected = false
-      setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0))
-      delete updatedProductQuantities[product.codigo]
+      // Deseleccionar el producto
+      product.selected = false;
+      setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0));
+      delete updatedProductQuantities[product.codigo];
     } else {
-      product.selected = true
-      setSelectedProductsCount(prevCount => prevCount + 1)
-      updatedProductQuantities[product.codigo] = 0 // Initialize with 0 quantity
+      // Seleccionar el producto
+      product.selected = true;
+      setSelectedProductsCount(prevCount => prevCount + 1);
+      updatedProductQuantities[product.codigo] = 0; // Initialize with 0 quantity
     }
-
-    setProductQuantities(updatedProductQuantities)
+  
+    setProductQuantities(updatedProductQuantities);
     setProducts(products.map(p =>
       p.codigo === product.codigo ? { ...p, selected: !p.selected } : p
-    ))
-  }, [productQuantities, products])
+    ));
+  }, [productQuantities, products]);
+  
 
   const handleQuantityChange = useCallback((productId, text) => {
     if (!/^\d*$/.test(text)) { // Allow empty string for quantity input
@@ -216,22 +250,29 @@ const SelectProducts = ({ isVisible, onClose }) => {
   }, [productQuantities, products])
 
   const generateSelectedProductJSON = () => {
-    const selectedProducts = products.filter(product => product.selected)
-    const selectedProductsWithQuantities = selectedProducts.map(product => ({
-      codigo: product.codigo,
-      descrip: product.descrip,
-      exists: product.existencia,
-      quantity: productQuantities[product.codigo] || 0,
-      priceUsd: product.precioUsd,
-      priceBs: (product.precioUsd * 36.372).toFixed(2),
-    }))
-
+    // Filtrar productos seleccionados
+    const selectedProducts = products.filter(product => product.selected);
+  
+    // Filtrar productos con cantidad mayor a 0
+    const selectedProductsWithQuantities = selectedProducts
+      .filter(product => (productQuantities[product.codigo] || 0) > 0) // Asegurarse de que la cantidad sea mayor a 0
+      .map(product => ({
+        codigo: product.codigo,
+        descrip: product.descrip,
+        exists: product.existencia,
+        quantity: productQuantities[product.codigo] || 0,
+        priceUsd: product.precioUsd,
+        priceBs: (product.precioUsd * 36.372).toFixed(2),
+      }));
+  
+    // Crear el objeto de la orden
     const order = {
       products: selectedProductsWithQuantities
-    }
-
-    return order
+    };
+  
+    return order;
   }
+  
 
   const validateOrder = () => {
     const selectedProducts = products.filter(product => product.selected)
@@ -372,6 +413,17 @@ const SelectProducts = ({ isVisible, onClose }) => {
     fetchProducts();
   };
 
+  const handleClose = () => {
+    // Vaciar productos seleccionados y cantidades
+    setProductQuantities({});
+    setSelectedProductsCount(0);
+  
+    // Cerrar el modal
+    onClose();
+  };
+  
+  
+
   return (
     <Modal visible={isVisible} animationType="slide" transparent={true}>
       <ImageBackground
@@ -435,15 +487,6 @@ const SelectProducts = ({ isVisible, onClose }) => {
                       onChangeText={text => handleQuantityChange(product.codigo, text)}
                     />
 
-                    {productQuantities[product.codigo] > 0 && (
-                      <Pressable
-                        style={styles.button}
-                        onPress={() => handleProductDelete(product.codigo)}
-                      >
-                        <MaterialIcons name="delete" size={30} color="#7A7A7B" />
-                      </Pressable>
-                    )}
-                    
                     <Pressable
                       style={styles.buttonMore}
                       onPress={() => {
@@ -454,10 +497,16 @@ const SelectProducts = ({ isVisible, onClose }) => {
                       <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
                     </Pressable>
 
-                  </View>
-                  {/* <View style={styles.buttonAction}>
+                    {productQuantities[product.codigo] > 0 && (
+                      <Pressable
+                        // style={styles.button}
+                        onPress={() => handleProductDelete(product.codigo)}
+                      >
+                        <MaterialIcons name="delete" size={30} color="#7A7A7B" />
+                      </Pressable>
+                    )}
 
-                  </View> */}
+                  </View>
                 </View>
               ))}
               </ScrollView>
@@ -471,7 +520,7 @@ const SelectProducts = ({ isVisible, onClose }) => {
           </View>
 
           <View style={styles.buttonsAction}>
-          <Pressable style={styles.buttonExit} onPress={onClose}>
+          <Pressable style={styles.buttonExit} onPress={handleClose}>
               <Text style={styles.buttonText}>Salir</Text>
             </Pressable>
             <Pressable

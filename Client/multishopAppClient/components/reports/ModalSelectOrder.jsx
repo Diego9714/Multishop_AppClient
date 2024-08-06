@@ -24,8 +24,8 @@ const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder, onViewO
       {selectedOrder && (
         <View style={styles.modalContainer}>
           <View style={styles.container}>
-            <Text style={styles.modalTitle}>{selectedOrder.nom_cli}</Text>
-            <Text style={styles.modalTitle}>{formatNumber(selectedOrder.totalUsd)}$</Text>
+            <Text style={styles.modalTitle}>{selectedOrder.id_order}</Text>
+            <Text style={styles.modalTitle}>{selectedOrder.fecha}</Text>
 
             <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Ver')}>
               <Text style={styles.modalButtonText}>Ver</Text>
