@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {instanceProducts} from '../global/api';
+// JWT - Token
+import JWT from 'expo-jwt'
 
 const storeData = async (key, value) => {
   try {
@@ -74,6 +76,27 @@ const getCompany = async (signal) => {
   }
 };
 
+const getOrdersSync = async (signal) => {
+  try {
+    let token = await AsyncStorage.getItem('tokenUser');
+    const decodedToken = JWT.decode(token, "appMultishop2024*");
+
+    let cod_cli = decodedToken.cod_cli;
+
+    const res = await instanceProducts.get(`/api/orders/client/${cod_cli}`, { signal });
+    const listorders = res.data.orders || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('SynchronizedOrders', listorders);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get orders was aborted.');
+    } else {
+      console.error('Error fetching orders:', error);
+    }
+    return { success: false, error };
+  }
+};
+
 const getAllInfo = async (setLoading, setMessage) => {
   setLoading(true);
   setMessage('');
@@ -95,7 +118,8 @@ const getAllInfo = async (setLoading, setMessage) => {
         getProducts(signal),
         getCategories(signal),
         getCurrency(signal),
-        getCompany(signal)
+        getCompany(signal),
+        getOrdersSync(signal)
       ]);
 
       clearTimeout(timeoutId);

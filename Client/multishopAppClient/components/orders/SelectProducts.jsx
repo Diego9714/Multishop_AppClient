@@ -487,24 +487,25 @@ const SelectProducts = ({ isVisible, onClose }) => {
                       onChangeText={text => handleQuantityChange(product.codigo, text)}
                     />
 
+                    {productQuantities[product.codigo] > 0 && (
+                      <Pressable
+                        style={styles.button}
+                        onPress={() => handleProductDelete(product.codigo)}
+                      >
+                        <MaterialIcons name="delete" size={33} color="#7A7A7B" />
+                      </Pressable>
+                    )}
+
+                    <View style={styles.buttonMore}>
                     <Pressable
-                      style={styles.buttonMore}
                       onPress={() => {
                         setSelectedProduct(product)
                         setIsProductModalVisible(true)
                       }}
                     >
-                      <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
+                      <MaterialIcons name="more-vert" size={33} color="#7A7A7B" />
                     </Pressable>
-
-                    {productQuantities[product.codigo] > 0 && (
-                      <Pressable
-                        // style={styles.button}
-                        onPress={() => handleProductDelete(product.codigo)}
-                      >
-                        <MaterialIcons name="delete" size={30} color="#7A7A7B" />
-                      </Pressable>
-                    )}
+                    </View>
 
                   </View>
                 </View>

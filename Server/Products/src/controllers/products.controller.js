@@ -41,3 +41,25 @@ controller.getCompany = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
+
+controller.getOrders = async (req, res) => {
+  try {
+
+    const { cod_cli } = req.params
+
+    if (!cod_cli || cod_cli.length === 0) {
+      return res.status(400).json({
+        status: false,
+        msg: "No client provided",
+        code: 400
+      })
+    }
+
+    const orders = await Products.orders(cod_cli)
+
+    res.status(orders.code).json(orders)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}

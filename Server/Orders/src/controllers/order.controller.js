@@ -12,7 +12,7 @@ controller.saveOrder = async (req, res) => {
 
     const { order } = req.body
 
-    console.log(order)
+    // console.log(order)
 
     if (!order || order.length === 0) {
       return res.status(400).json({

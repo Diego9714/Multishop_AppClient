@@ -13,11 +13,13 @@ const ModalFilterProducts = ({ visible, onClose, onSave }) => {
   // Función para manejar la selección del orden de cantidad
   const handleQuantityOrderSelect = (order) => {
     setSelectedQuantityOrderTemp(order === selectedQuantityOrderTemp ? null : order)
+    if (order) setSelectedPriceOrderTemp(null)
   }
 
   // Función para manejar la selección del orden de precio
   const handlePriceOrderSelect = (order) => {
     setSelectedPriceOrderTemp(order === selectedPriceOrderTemp ? null : order)
+    if (order) setSelectedQuantityOrderTemp(null)
   }
 
   // Función para guardar los filtros seleccionados y cerrar el modal

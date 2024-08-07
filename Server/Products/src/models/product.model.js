@@ -1,5 +1,6 @@
 import { createAccessToken }   from '../libs/jwt.js'
 import { pool }   from '../connection/mysql.connect.js'
+import { format } from 'date-fns'
 
 export class Products {
   static async all() {
@@ -164,5 +165,108 @@ export class Products {
       return error
     }
   }
+
+  static async orders(cod_cli) {
+    try {
+      const msg = {
+        status: false,
+        msg: "Error retrieving orders",
+        code: 500
+      };
+  
+      const connection = await pool.getConnection();
+  
+      // Query to get orders details
+      const sqlPre = `
+        SELECT 
+          preorder.cod_order, 
+          preorder.id_scli, 
+          preorder.cod_cli, 
+          scli.nom_cli, 
+          scli.dir1_cli AS dir_cli,
+          scli.tel_cli AS tlf_cli,
+          preorder.tip_doc AS tipfac, 
+          preorder.amountUsd AS totalUsd, 
+          preorder.amountBs AS totalBs, 
+          preorder.date_created AS fecha
+        FROM preorder 
+        JOIN scli ON preorder.id_scli = scli.id_scli 
+        WHERE preorder.cod_cli = ?;
+      `;
+      const [preorders] = await connection.execute(sqlPre, [cod_cli]);
+  
+      // Query to get products for each order
+      const sqlPro = `SELECT 
+        cod_order, 
+        codigo, 
+        descrip, 
+        quantity, 
+        priceUsd, 
+        priceBs 
+      FROM prodorder 
+      WHERE cod_cli = ?;`;
+      const [prodorders] = await connection.execute(sqlPro, [cod_cli]);
+  
+      connection.release();
+  
+      const formatDate = (dateString) => {
+        return format(new Date(dateString), 'dd/MM/yyyy');
+      };
+  
+      // Organize orders and products
+      if (preorders.length > 0) {
+        // Map orders with their products
+        const orders = preorders.map(order => {
+          // Filter products for the current order
+          const products = prodorders.filter(product => product.cod_order === order.cod_order);
+  
+          return {
+            id_order: order.cod_order,
+            id_scli: order.id_scli,
+            nom_cli: order.nom_cli,
+            cod_cli: order.cod_cli,
+            dir_cli: order.dir_cli,
+            products: products.map(p => ({
+              codigo: p.codigo,
+              descrip: p.descrip,
+              quantity: p.quantity,
+              priceUsd: p.priceUsd,
+              priceBs: p.priceBs
+            })),
+            tipfac: order.tipfac,
+            tlf_cli: order.tlf_cli,
+            totalBs: order.totalBs,
+            totalUsd: order.totalUsd,
+            fecha: formatDate(order.fecha)
+          };
+        });
+  
+        return {
+          status: true,
+          msg: "Orders found",
+          code: 200,
+          orders
+        };
+      } else {
+        // Return a 200 status with a message indicating no orders
+        return {
+          status: true,
+          msg: "No orders found",
+          code: 200,
+          orders: []
+        };
+      }
+    } catch (error) {
+      return {
+        status: false,
+        msg: "Error retrieving orders",
+        code: 500,
+        error: error.message
+      };
+    }
+  }
+  
+  
+  
 }
 

@@ -31,6 +31,12 @@ const ViewOrder = ({ isVisible, onClose, selectedOrder }) => {
     }
 
     getCompany()
+
+    const intervalId = setInterval(() => {
+      getCompany();
+    }, 3000);
+
+    return () => clearInterval(intervalId);
   }, [])
 
   const updateTotal = (products) => {
@@ -62,7 +68,7 @@ const ViewOrder = ({ isVisible, onClose, selectedOrder }) => {
 
     let dataCompany = JSON.parse(company)
 
-    console.log(dataCompany)
+    // console.log(dataCompany[0].rif_emp)
 
     const htmlContent = `
     <html>

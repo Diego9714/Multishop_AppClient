@@ -218,14 +218,14 @@ const styles = StyleSheet.create({
   quantityContainer: {
     width: '42%',
     // marginLeft: 2,
-    // backgroundColor: 'gray',
+    // backgroundColor: '#ccffda',
     // justifyContent: 'center',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
   },
   quantityInput: {
-    marginLeft: 25,
+    marginLeft: 5,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
@@ -242,8 +242,11 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   buttonMore: {
-    // padding: 5,
-    // marginRight: 15,
+    width: '100%',
+    justifyContent: 'right',
+    alignItems: 'flex-end',
+    position: 'absolute',
+    marginRight: 15,
   },
   centerButtonPlaceholder: {
     width: 30, // mismo ancho que el icono delete para mantener el espacio consistente

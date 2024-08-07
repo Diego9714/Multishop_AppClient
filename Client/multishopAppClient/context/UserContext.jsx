@@ -57,6 +57,7 @@ export const UserProvider = ({ children }) => {
         await AsyncStorage.removeItem('brands')
         await AsyncStorage.removeItem('currency')
         await AsyncStorage.removeItem('company')
+        await AsyncStorage.removeItem('SynchronizedOrders')
 
         router.replace('/(auth)/Login')
       }

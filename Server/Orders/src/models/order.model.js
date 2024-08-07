@@ -1,4 +1,5 @@
 import { pool }   from '../connection/mysql.connect.js'
+import {parse, format } from 'date-fns'
 
 export class Orders {
   static async saveOrder(order) {
@@ -11,21 +12,25 @@ export class Orders {
       for (const info of order) {
         const { id_order, id_scli, cod_cli, nom_cli, totalUsd, totalBs, tipfac, fecha, products, prodExistence } = info
   
-        const dateObj = new Date(fecha);
-        const day = dateObj.getDate().toString().padStart(2, '0')
-        const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
-        const year = dateObj.getFullYear()
-        const formattedFecha = `${year}-${month}-${day}-`
+        // Convertir la fecha desde 'DD/MM/YYYY' a un objeto Date
+        const dateObj = parse(fecha, 'dd/MM/yyyy', new Date());
+
+        // Formatear la fecha a 'YYYY-MM-DD'
+        const formattedFecha = format(dateObj, 'yyyy-MM-dd');
+
+        console.log("formattedFecha");
+        console.log(formattedFecha);
+
   
-        const existingOrder = `SELECT id_order FROM preorder WHERE id_scli = ? AND cod_cli = ?  AND amountUsd = ? AND date_created = ?;`
-        const [checkOrder] = await connection.execute(existingOrder, [id_scli, cod_cli, totalUsd, formattedFecha])
+        const existingOrder = `SELECT id_order FROM preorder WHERE cod_order = ? AND id_scli = ? AND cod_cli = ?  AND amountUsd = ? AND date_created = ?;`
+        const [checkOrder] = await connection.execute(existingOrder, [id_order ,id_scli, cod_cli, totalUsd, formattedFecha])
   
         if (checkOrder.length > 0) {
           ordersCompleted.push(info)
         } else {  
           // Registramos el pedido
-          let sqlOrder = 'INSERT INTO preorder (id_scli, cod_cli,  amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?);'
-          let [orderResult] = await connection.execute(sqlOrder, [id_scli, cod_cli,  totalUsd, totalBs, tipfac, formattedFecha])
+          let sqlOrder = 'INSERT INTO preorder (cod_order , id_scli, cod_cli,  amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
+          let [orderResult] = await connection.execute(sqlOrder, [id_order, id_scli, cod_cli,  totalUsd, totalBs, tipfac, formattedFecha])
   
           const id_orderr = orderResult.insertId
   
@@ -35,8 +40,8 @@ export class Orders {
             for (const prod of products) {
               const { codigo, quantity, descrip, priceUsd, priceBs } = prod
     
-              const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);`
-              await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
+              const saveProd = `INSERT INTO prodorder (id_order, cod_order, cod_cli, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+              await connection.execute(saveProd, [id_orderr, id_order, cod_cli, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
             }
           }else{
             // Verificamos la existencia de los productos
@@ -59,8 +64,8 @@ export class Orders {
                 }
     
                 // Guardamos el producto en el pedido
-                const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);`
-                await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
+                const saveProd = `INSERT INTO prodorder (id_order, cod_order, cod_cli, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+                await connection.execute(saveProd, [id_orderr, id_order, cod_cli, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
     
                 // Actualizamos la existencia del producto
                 const updateExistence = `UPDATE sinv SET existencia = ? WHERE codigo = ?;`

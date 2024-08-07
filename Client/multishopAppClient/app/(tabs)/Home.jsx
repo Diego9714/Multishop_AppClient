@@ -5,6 +5,8 @@ import ModalErrorSincro from '../../components/home/ModalErrorSincro'; // Import
 import CardsHome from '../../components/home/CardsHome';
 import Navbar from '../../components/Navbar';
 import { instanceProducts } from '../../global/api';
+// JWT - Token
+import JWT from 'expo-jwt';
 
 // Helper functions
 const storeData = async (key, value) => {
@@ -19,7 +21,7 @@ const storeData = async (key, value) => {
 const getProducts = async (signal) => {
   try {
     const res = await instanceProducts.get(`/api/products`, { signal });
-    const listProducts = res.data.products;
+    const listProducts = res.data.products || []; // Asegúrate de que sea una lista, incluso si está vacía
     await storeData('products', listProducts);
     return { success: true };
   } catch (error) {
@@ -35,7 +37,7 @@ const getProducts = async (signal) => {
 const getCategories = async (signal) => {
   try {
     const res = await instanceProducts.get(`/api/categories`, { signal });
-    const listCategories = res.data.categories;
+    const listCategories = res.data.categories || []; // Asegúrate de que sea una lista, incluso si está vacía
     await storeData('categories', listCategories);
     return { success: true };
   } catch (error) {
@@ -51,7 +53,7 @@ const getCategories = async (signal) => {
 const getCurrency = async (signal) => {
   try {
     const res = await instanceProducts.get(`/api/currency`, { signal });
-    const listCurrency = res.data.currency;
+    const listCurrency = res.data.currency || []; // Asegúrate de que sea una lista, incluso si está vacía
     await storeData('currency', listCurrency);
     return { success: true };
   } catch (error) {
@@ -67,7 +69,7 @@ const getCurrency = async (signal) => {
 const getCompany = async (signal) => {
   try {
     const res = await instanceProducts.get(`/api/company`, { signal });
-    const listCompany = res.data.company;
+    const listCompany = res.data.company || []; // Asegúrate de que sea una lista, incluso si está vacía
     await storeData('company', listCompany);
     return { success: true };
   } catch (error) {
@@ -80,11 +82,32 @@ const getCompany = async (signal) => {
   }
 };
 
+const getOrdersSync = async (signal) => {
+  try {
+    let token = await AsyncStorage.getItem('tokenUser');
+    const decodedToken = JWT.decode(token, "appMultishop2024*");
+
+    let cod_cli = decodedToken.cod_cli;
+
+    const res = await instanceProducts.get(`/api/orders/client/${cod_cli}`, { signal });
+    const listorders = res.data.orders || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('SynchronizedOrders', listorders);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get orders was aborted.');
+    } else {
+      console.error('Error fetching orders:', error);
+    }
+    return { success: false, error };
+  }
+};
+
 const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
   setLoading(true);
   setMessage('');
   setShowErrorModal(false); // Reinicia el estado del modal al iniciar la sincronización
-  
+
   const controller = new AbortController();
   const { signal } = controller;
 
@@ -93,7 +116,7 @@ const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
     setLoading(false);
     setMessage('Tiempo de espera agotado. Intenta nuevamente.');
     setShowErrorModal(true);
-  }, 5000); // Timeout de 5 segundos
+  }, 2000); // Timeout de 2 segundos
 
   try {
     const token = await AsyncStorage.getItem('tokenUser');
@@ -102,7 +125,8 @@ const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
         getProducts(signal),
         getCategories(signal),
         getCurrency(signal),
-        getCompany(signal)
+        getCompany(signal),
+        getOrdersSync(signal)
       ]);
 
       clearTimeout(timeoutId);

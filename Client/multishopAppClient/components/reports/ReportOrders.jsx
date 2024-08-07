@@ -102,7 +102,8 @@ const ReportOrders = ({ isVisible, onClose }) => {
   useEffect(() => {
     const getOrders = async () => {
       const synchronizedOrdersString = await AsyncStorage.getItem('SynchronizedOrders');
-      const synchronizedOrders = synchronizedOrdersString ? JSON.parse(synchronizedOrdersString) : [];
+      const synchronizedOrders = synchronizedOrdersString ? JSON.parse(synchronizedOrdersString) : []
+      
       setOrders(synchronizedOrders);
       setFilteredOrders((prev) => {
         // If no filters are applied, update filteredOrders; otherwise, keep previous filtered state
@@ -117,10 +118,10 @@ const ReportOrders = ({ isVisible, onClose }) => {
 
     const intervalId = setInterval(() => {
       getOrders();
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [startDate, endDate]); // Depend on startDate and endDate to fetch and update orders
+  }, [])
 
   const applyPagination = () => {
     const start = (page - 1) * itemsPerPage;
@@ -223,7 +224,7 @@ const ReportOrders = ({ isVisible, onClose }) => {
                     </View>
                   ))
                 ) : (
-                  <Text style={styles.noOrdersText}>No hay pedidos disponibles</Text>
+                  <Text style={styles.noOrdersText}></Text>
                 )}
               </ScrollView>
             </View>
@@ -246,12 +247,13 @@ const ReportOrders = ({ isVisible, onClose }) => {
         onClose={handleCloseModalSelect}
         onAction={handleAction}
         selectedOrder={selectedOrder}
+        onViewOrder={handleOpenViewOrder}
       />
 
       <ViewOrder
         isVisible={isViewOrderVisible}
         onClose={handleCloseViewOrder}
-        order={selectedOrder}
+        selectedOrder={selectedOrder}
       />
     </>
   );

@@ -18,3 +18,4 @@ export const CATEGORY                  = process.env.CATEGORY
 export const BRANDS                    = process.env.BRANDS
 export const CURRENCY                  = process.env.CURRENCY
 export const COMPANY                   = process.env.COMPANY
+export const MYORDERS                   = process.env.MYORDERS

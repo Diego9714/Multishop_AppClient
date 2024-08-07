@@ -40,7 +40,7 @@ const ListProducts = () => {
   
     const intervalId = setInterval(() => {
       getProductsAndCategories();
-    }, 10000)
+    }, 3000)
   
     return () => clearInterval(intervalId);
   }, []);

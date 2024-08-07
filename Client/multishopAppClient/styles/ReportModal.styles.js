@@ -111,12 +111,11 @@ const styles = StyleSheet.create({
   buttonDate: {
     display: "flex",
     flexDirection: "row",
-    width: 140,
     backgroundColor: '#fff',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 6,
+    padding: 5,
     shadowColor: "#000",
     shadowOffset: {
       width: 5,
