@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon384_rounded.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.diego9714.multishopAppClient"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +32,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "302c36bd-731c-4100-98fe-55913d169d5d"
+      }
     }
   }
 }

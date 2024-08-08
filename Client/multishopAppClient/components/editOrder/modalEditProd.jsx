@@ -128,10 +128,10 @@ const ModalEditProd = ({ isVisible, selectedProduct, onClose, onQuantityChange, 
               onChangeText={handleQuantityChange}
             />
           </View>
-          <Text style={styles.subtitleModal}>Precio(Bs)</Text>
+          {/* <Text style={styles.subtitleModal}>Precio(Bs)</Text>
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{(selectedProduct.priceUsd * 36.372).toFixed(2)}</Text>
-          </View>
+          </View> */}
           <Text style={styles.subtitleModal}>Precio(Usd)</Text>
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{selectedProduct.priceUsd}</Text>
