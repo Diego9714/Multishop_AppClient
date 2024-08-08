@@ -1,32 +1,45 @@
-// ModalOrderSaved.jsx
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import styles from '../../styles/ModalOrderSaved.styles';
 
 const ModalOrderSaved = ({ isVisible, onClose, onOrderSaved }) => {
-  const scaleValue = new Animated.Value(0);
-  const opacityValue = new Animated.Value(0);
+  const scaleValue = useRef(new Animated.Value(0)).current;
+  const opacityValue = useRef(new Animated.Value(0)).current;
 
-  if (isVisible) {
-    Animated.parallel([
-      Animated.spring(scaleValue, {
-        toValue: 1,
-        friction: 2,
-        tension: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityValue, {
-        toValue: 1,
-        duration: 500,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  } else {
-    scaleValue.setValue(0);
-    opacityValue.setValue(0);
-  }
+  useEffect(() => {
+    if (isVisible) {
+      Animated.parallel([
+        Animated.spring(scaleValue, {
+          toValue: 1,
+          friction: 2,
+          tension: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 1,
+          duration: 500,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.spring(scaleValue, {
+          toValue: 0,
+          friction: 2,
+          tension: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 0,
+          duration: 500,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [isVisible]);
 
   return (
     <Modal visible={isVisible} animationType="fade" transparent={true}>

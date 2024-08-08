@@ -140,53 +140,64 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   }, [productQuantities, products])
 
   const handleQuantityChange = useCallback((productId, text) => {
-    if (!/^\d*$/.test(text)) { // Permitir cadena vacía para la entrada de cantidad
+    if (!/^\d*$/.test(text)) { // Allow empty string for quantity input
       Alert.alert('Cantidad no válida', 'Por favor ingrese solo números enteros positivos.')
       return
     }
   
     const quantity = text === '' ? 0 : parseInt(text, 10)
     const product = products.find(p => p.codigo === productId)
-    
-    // No modificar la existencia del producto en el inventario
+  
+    // Allow any quantity greater than 0 if prodExistence is 0
     if (prodExistence === 0 && quantity > 0) {
       const updatedProductQuantities = { ...productQuantities }
-      const wasSelected = updatedProductQuantities[productId] > 0
-  
       updatedProductQuantities[productId] = quantity
   
-      if (quantity > 0 && !wasSelected) {
-        setSelectedProductsCount(prevCount => prevCount + 1)
-      } else if (quantity === 0 && wasSelected) {
-        setSelectedProductsCount(prevCount => prevCount - 1)
+      if (quantity > 0) {
+        if (!product.selected) {
+          product.selected = true
+          setSelectedProductsCount(prevCount => prevCount + 1)
+        }
+      } else {
+        if (product.selected) {
+          product.selected = false
+          setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0))
+        }
       }
   
       setProductQuantities(updatedProductQuantities)
+      setProducts(products.map(p =>
+        p.codigo === productId ? { ...p, selected: quantity > 0 } : p
+      ))
       return
     }
-
-    const productOrder = selectedOrder.products.find(p => p.codigo === productId) || { exists: 0 }
   
-    setproducCant(productOrder.exists)
-
-    if (quantity > product.existencia + productOrder.exists) { // Se debe verificar contra la existencia del inventario
+    // Standard quantity check
+    if (quantity > product.existencia) {
       Alert.alert('Cantidad no disponible', `La cantidad ingresada: ${quantity} supera la cantidad existente en el inventario: ${product.existencia}`)
-      handleProductDelete(productId)
+      handleProductDelete(productId) // Deselect the product and clear the quantity if it exceeds the stock
       return
     }
   
     const updatedProductQuantities = { ...productQuantities }
-    const wasSelected = updatedProductQuantities[productId] > 0
-  
     updatedProductQuantities[productId] = quantity
   
-    if (quantity > 0 && !wasSelected) {
-      setSelectedProductsCount(prevCount => prevCount + 1)
-    } else if (quantity === 0 && wasSelected) {
-      setSelectedProductsCount(prevCount => prevCount - 1)
+    if (quantity > 0) {
+      if (!product.selected) {
+        product.selected = true
+        setSelectedProductsCount(prevCount => prevCount + 1)
+      }
+    } else {
+      if (product.selected) {
+        product.selected = false
+        setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0))
+      }
     }
   
     setProductQuantities(updatedProductQuantities)
+    setProducts(products.map(p =>
+      p.codigo === productId ? { ...p, selected: quantity > 0 } : p
+    ))
   }, [productQuantities, products, prodExistence])
   
 
@@ -313,6 +324,9 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     setProductQuantities(initialProductQuantities)
     setSelectedProductsCount(Object.keys(initialProductQuantities).length)
     onClose()
+    setSearchCategory([])
+    setPriceOrder('')
+    setIsFiltering(false)
   }
   
 
